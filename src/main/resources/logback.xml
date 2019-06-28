@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/jt809-tcp-server.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>log/backup/logFile.server.%d{yyyy-MM}.%i.zip</fileNamePattern>
+            <!-- each file should be at most 100MB, keep 60 days worth of history, but at most 20GB -->
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>6</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy/MM/dd-HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- error 级别日志文件 -->
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>log/jt809-tcp-server-error.log</File>
+        <encoder>
+            <Pattern>%date [%thread] %-5level [%file:%line] - %msg%n</Pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>log/jt809-tcp-server-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxHistory>7</maxHistory>
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>512MB</maxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+        <appender-ref ref="error"/>
+    </root>
+</configuration>

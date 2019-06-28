@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>cn.com.onlinetool</groupId>
+    <artifactId>jt809-tcp-server</artifactId>
+
+    <!-- 重大发布.小版本.增量版本-版本标识 -->
+    <version>0.1.0-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+
+    <name>jt809-tcp-server</name>
+    <url>https://github.com/ch0ice/jt809-tcp-server</url>
+    <description>parse JTT 809-2011 protocol of ministry of transportation</description>
+
+    <inceptionYear>2019</inceptionYear>
+
+    <developers>
+        <developer>
+            <id>choice</id>
+            <name>choice</name>
+            <email>mr_liuzeyuan@163.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/ch0ice/jt809-tcp-server</url>
+        <connection>https://github.com/ch0ice/jt809-tcp-server.git</connection>
+    </scm>
+
+
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+
+        <mockito.version>1.10.19</mockito.version>
+        <netty.version>4.1.32.Final</netty.version>
+        <fastjson>1.2.41</fastjson>
+        <client.proptocol.version>2.1</client.proptocol.version>
+        <marshalling.version>2.0.6.Final</marshalling.version>
+        <lombok.version>1.18.4</lombok.version>
+        <msgpack.version>0.6.12</msgpack.version>
+        <spring-boot-starter>2.1.6.RELEASE</spring-boot-starter>
+        <spring-kafka>2.2.7.RELEASE</spring-kafka>
+        <junit>4.12</junit>
+        <junit-jupiter>5.4.2</junit-jupiter>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit-jupiter}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring-boot-starter}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring-boot-starter}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <version>${spring-boot-starter}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>${spring-kafka}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>${spring-boot-starter}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>${spring-boot-starter}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot-starter}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.python</groupId>
+            <artifactId>jython-standalone</artifactId>
+            <version>2.7.1</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <finalName>${project.name}</finalName>
+                    <classifier>boot</classifier>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 包含 -->
+                    <includes>
+                    </includes>
+                    <!-- 排除 -->
+                    <excludes>
+                        <exclude>**/server/*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>sandbox</id>
+            <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>*/**</include>
+                        </includes>
+                        <excludes>
+                            <exclude>
+                                config/*.properties
+                            </exclude>
+                            <exclude>
+                                static/**
+                            </exclude>
+                            <exclude>
+                                *.properties
+                            </exclude>
+                            <exclude>
+                                logback.xml
+                            </exclude>
+                        </excludes>
+                    </resource>
+                </resources>
+            </build>
+        </profile>
+    </profiles>
+</project>
+

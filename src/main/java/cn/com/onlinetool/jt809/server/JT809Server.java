@@ -1,0 +1,63 @@
+package cn.com.onlinetool.jt809.server;
+
+import cn.com.onlinetool.jt809.config.NettyConfig;
+import cn.com.onlinetool.jt809.init.JT809ServerChannelInit;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author choice
+ * @description: netty启动类
+ * @date 2018-12-27 12:52
+ *
+ */
+@Service
+public class JT809Server {
+    private Logger logger = LoggerFactory.getLogger(JT809Server.class);
+
+    @Autowired
+    private NettyConfig nettyConfig;
+    @Autowired
+    private JT809ServerChannelInit JT809ServerChannelInit;
+
+    public void runServer() throws Exception{
+        //创建主线程池（接收线程池）
+        EventLoopGroup boosGroup = new NioEventLoopGroup(nettyConfig.getBossMaxThreadCount(),new DefaultThreadFactory("boosServer",true));
+        //创建工作线程池
+        EventLoopGroup workGroup = new NioEventLoopGroup(nettyConfig.getWorkMaxThreadCount(),new DefaultThreadFactory("workServer",true));
+
+        try {
+            //创建一个服务器端的程序类进行NIO的启动，同时可以设置Channel
+            ServerBootstrap serverBootstrap = new ServerBootstrap();
+            //设置要使用的线程池以及当前的Channel 的类型
+            serverBootstrap.group(boosGroup,workGroup).channel(NioServerSocketChannel.class);
+            //接收到的信息处理器
+            serverBootstrap.childHandler(JT809ServerChannelInit);
+            //可以直接利用常量进行TCP协议的相关配置
+            serverBootstrap.option(ChannelOption.SO_BACKLOG,128);
+            serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE,true);
+            //ChannelFuture描述异步回调的处理操作
+            ChannelFuture future = serverBootstrap.bind(nettyConfig.getTcpPort()).sync();
+
+            logger.warn("nettyServer run success,TCP-PORT:{}",nettyConfig.getTcpPort());
+
+            //等待socket被关闭
+            future.channel().closeFuture().sync();
+        } catch (Exception e){
+            logger.error("nettyServer run fail");
+        } finally {
+            workGroup.shutdownGracefully();
+            boosGroup.shutdownGracefully();
+        }
+
+    }
+}
