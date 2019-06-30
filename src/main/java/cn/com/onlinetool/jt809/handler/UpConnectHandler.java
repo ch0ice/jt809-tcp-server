@@ -1,14 +1,11 @@
 package cn.com.onlinetool.jt809.handler;
 
-import cn.com.onlinetool.jt809.bean.BasePacket;
+import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpConnectReq;
-import cn.com.onlinetool.jt809.manage.TcpChannelMsgManage;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,12 +23,11 @@ public class UpConnectHandler implements CommonHandler {
 //    TcpChannelMsgManage tcpChannelMsgManage;
 
     @Override
-    public void handler(ChannelHandlerContext ctx, Object msg) {
-        BasePacket basePacket = (BasePacket) msg;
-        int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(basePacket.getMsgBody(),0,4));
-        String password = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(basePacket.getMsgBody(),4,8));
-        String downLinkIp = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(basePacket.getMsgBody(),12,32));
-        String downLinkPort = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(basePacket.getMsgBody(),44,2));
+    public void handler(ChannelHandlerContext ctx, Message msg) {
+        int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),0,4));
+        String password = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),4,8));
+        String downLinkIp = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),12,32));
+        String downLinkPort = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),44,2));
 
         UpConnectReq req = new UpConnectReq();
         req.setUserId(userId);

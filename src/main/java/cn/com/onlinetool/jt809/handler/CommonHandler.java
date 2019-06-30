@@ -1,5 +1,6 @@
 package cn.com.onlinetool.jt809.handler;
 
+import cn.com.onlinetool.jt809.bean.Message;
 import io.netty.channel.ChannelHandlerContext;
 
 /**
@@ -10,5 +11,5 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public interface CommonHandler {
 
-    void handler(ChannelHandlerContext ctx,Object msg);
+    void handler(ChannelHandlerContext ctx, Message msg);
 }

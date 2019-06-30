@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Message {
-    private String headFlag;
+    private byte headFlag;
     private MessageHead msgHead;
     private byte[] msgBody;
-    private String crcCode;
-    private String endFlag;
+    private byte[] crcCode;
+    private byte endFlag;
 }

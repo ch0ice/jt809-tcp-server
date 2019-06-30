@@ -1,13 +1,10 @@
 package cn.com.onlinetool.jt809.adapter;
 
-import cn.com.onlinetool.jt809.bean.BasePacket;
-import cn.com.onlinetool.jt809.enums.BasePacketEnum;
+import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.config.BusinessConfig;
 import cn.com.onlinetool.jt809.config.NettyConfig;
-import cn.com.onlinetool.jt809.handler.CommonHandler;
 import cn.com.onlinetool.jt809.handler.CommonHandlerFactory;
 import cn.com.onlinetool.jt809.manage.TcpChannelMsgManage;
-import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -16,11 +13,9 @@ import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
 import java.util.concurrent.*;
 
 /**
@@ -89,8 +84,8 @@ public class JT809ServerAdapter extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         businessExecutor.submit(() -> {
-            BasePacket basePacket = (BasePacket)msg;
-            handlerFactory.getHandler(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(basePacket.getMsgHead(),8,2))).handler(ctx,msg);
+            Message message = (Message) msg;
+            handlerFactory.getHandler(message.getMsgHead().getMsgId()).handler(ctx,message);
         });
     }
 

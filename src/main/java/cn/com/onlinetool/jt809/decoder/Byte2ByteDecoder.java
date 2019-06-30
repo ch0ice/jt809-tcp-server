@@ -1,7 +1,6 @@
 package cn.com.onlinetool.jt809.decoder;
 
 
-import cn.com.onlinetool.jt809.bean.BasePacket;
 import cn.com.onlinetool.jt809.constants.JT809Constants;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import cn.com.onlinetool.jt809.util.PacketUtil;
@@ -48,6 +47,19 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
             logger.info("拼接后的数据包：{}",ByteArrayUtil.bytes2HexStr(readDatas));
         }
 
+        byte[] h = new byte[]{readDatas[0]};
+        byte[] l = new byte[]{readDatas[readDatas.length - 1]};
+        byte[] a = ByteArrayUtil.subBytes(readDatas,1,readDatas.length - 2);
+        //数据转义
+        String dataStr = ByteArrayUtil.bytes2FullHexStr(a);
+        dataStr = dataStr.replaceAll("0x5a0x01","0x5b");
+        dataStr = dataStr.replaceAll("0x5a0x02","0x5a");
+        dataStr = dataStr.replaceAll("0x5e0x01","0x5d");
+        dataStr = dataStr.replaceAll("0x5e0x02","0x5e");
+        a = ByteArrayUtil.fullHexStr2Bytes(dataStr);
+        a = ByteArrayUtil.append(h,a);
+        readDatas = ByteArrayUtil.append(a,l);
+
         //如果数据小于一整包数据的最小长度
         if(readDatas.length < JT809Constants.MSG_MIN_LEN){
             logger.warn("数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(readDatas));
@@ -80,24 +92,14 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
      */
     private void parseAndPushData(String channelKey,byte[] readDatas,int index,List<Object> out){
         if(PacketUtil.checkHeadFlag(readDatas)){
-            BasePacket basePacket = new BasePacket();
-            basePacket.setHeadFlag(readDatas[index]);
-            int offset = index + 1;
-            basePacket.setMsgHead(ByteArrayUtil.subBytes(readDatas,offset,JT809Constants.MSG_HEAD_LEN));
-            offset += JT809Constants.MSG_HEAD_LEN;
-            basePacket.setMsgBody(ByteArrayUtil.subBytes(readDatas,offset,PacketUtil.getMsgBodyLen(readDatas)));
-            offset += PacketUtil.getMsgBodyLen(readDatas);
-            basePacket.setCrcCode(ByteArrayUtil.subBytes(readDatas,offset,JT809Constants.MSG_CRC_LEN));
-            offset += JT809Constants.MSG_CRC_LEN;
-
             //整包长度
             int packetLen = PacketUtil.getPacketLen(readDatas);
             //验证数据包有效性
-            if(PacketUtil.checkPacket(basePacket)){
+            if(PacketUtil.checkPacket(readDatas)){
                 //一个完整包
                 byte[] fullPacket = ByteArrayUtil.subBytes(readDatas,index,packetLen);
                 logger.info("拆包后的单包数据 --> baseData : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
-                out.add(basePacket);
+                out.add(PacketUtil.bytes2Message(fullPacket));
                 index += packetLen;
                 //终端成功响应
 //                byte[] result = new byte[9];
@@ -124,7 +126,7 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
             }
 
             //下一包数据的总长度
-            packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(readDatas,offset,readDatas.length));
+            packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(readDatas,index,readDatas.length));
             //剩余数据长度小于整包数据长度
             if(remainingLen < packetLen){
                 logger.warn("剩余数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));

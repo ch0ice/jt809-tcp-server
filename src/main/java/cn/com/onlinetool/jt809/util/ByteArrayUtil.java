@@ -177,6 +177,28 @@ public class ByteArrayUtil {
     }
 
     /**
+     * 数组转换成带0x的十六进制字符串
+     * @param array
+     * @return HexString
+     */
+    public static String bytes2FullHexStr(byte[] array) {
+        StringBuffer sb = new StringBuffer(array.length);
+        sb.append("0x");
+        String sTemp;
+        for (int i = 0; i < array.length; i++) {
+            sTemp = Integer.toHexString(0xFF & array[i]);
+            if (sTemp.length() < 2){
+                sb.append(0);
+            }
+            sb.append(sTemp.toUpperCase());
+            if(i < array.length-1){
+                sb.append("0x");
+            }
+        }
+        return sb.toString().toLowerCase();
+    }
+
+    /**
      * 把16进制字符串转换成字节数组
      * @param hex
      * @return byte[]
@@ -190,6 +212,16 @@ public class ByteArrayUtil {
             result[i] = (byte) (toByte(achar[pos]) << 4 | toByte(achar[pos + 1]));
         }
         return result;
+    }
+
+    /**
+     * 把带0x的16进制字符串转换成字节数组
+     * @param hex
+     * @return byte[]
+     */
+    public static byte[] fullHexStr2Bytes(String hex){
+        hex = hex.toLowerCase().replaceAll("0x","").trim();
+        return hexStr2Bytes(hex);
     }
 
     private static int toByte(char c) {

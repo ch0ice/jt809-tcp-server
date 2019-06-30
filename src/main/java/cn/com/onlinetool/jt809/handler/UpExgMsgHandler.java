@@ -1,6 +1,6 @@
 package cn.com.onlinetool.jt809.handler;
 
-import cn.com.onlinetool.jt809.bean.BasePacket;
+import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpExgMsg;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import cn.com.onlinetool.jt809.util.PacketUtil;
@@ -22,13 +22,12 @@ import static cn.com.onlinetool.jt809.constants.JT809DataTypeConstants.*;
 public class UpExgMsgHandler implements CommonHandler{
 
     @Override
-    public void handler(ChannelHandlerContext ctx, Object msg) {
-        BasePacket basePacket = (BasePacket) msg;
-        String vehicleNo = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(basePacket.getMsgBody(),0,21));
-        int vehicleColor = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(basePacket.getMsgBody(),21,1));
-        int dataType = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(basePacket.getMsgBody(),22,2));
-        int dataLen = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(basePacket.getMsgBody(),24,4));
-        byte[] data = ByteArrayUtil.subBytes(basePacket.getMsgBody(),28,basePacket.getMsgBody().length);
+    public void handler(ChannelHandlerContext ctx, Message msg) {
+        String vehicleNo = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),0,21));
+        int vehicleColor = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),21,1));
+        int dataType = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),22,2));
+        int dataLen = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),24,4));
+        byte[] data = ByteArrayUtil.subBytes(msg.getMsgBody(),28,msg.getMsgBody().length - 28 - 1);
         UpExgMsg upExgMsg = new UpExgMsg();
         upExgMsg.setVehicleNo(vehicleNo);
         upExgMsg.setVehicleColor(vehicleColor);

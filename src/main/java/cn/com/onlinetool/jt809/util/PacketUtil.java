@@ -1,6 +1,5 @@
 package cn.com.onlinetool.jt809.util;
 
-import cn.com.onlinetool.jt809.bean.BasePacket;
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.MessageHead;
 import cn.com.onlinetool.jt809.constants.JT809Constants;
@@ -58,28 +57,48 @@ public class PacketUtil {
      * 校验数据体
      * @return
      */
-    public static boolean checkPacket(BasePacket basePacket){
+    public static boolean checkPacket(byte[] basePacket){
         boolean flag = false;
         return true;
     }
 
     /**
      * 解析数据头
-     * @param realBytes
+     * @param fullPacket
      * @return
      */
-    public static MessageHead parseMsgHead(byte[] realBytes) {
+    public static Message bytes2Message(byte[] fullPacket) {
 
+        Message message = new Message();
+
+        int idx = 0;
+        message.setHeadFlag(fullPacket[0]);
+        idx += 1;
         MessageHead messageHead = new MessageHead();
-        messageHead.setMsgLength(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,0,4)));
-        messageHead.setMsgSn(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,4,4)));
-        messageHead.setMsgId(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,8,2)));
-        messageHead.setMsgGnssCenterId(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,10,4)));
-        messageHead.setVersionFlag(ByteArrayUtil.subBytes(realBytes,14,3));
-        messageHead.setEncrypyFlag(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,17,1)));
-        messageHead.setEncrypyKey(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,18,4)));
+        messageHead.setMsgLength(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
+        idx += 4;
+        messageHead.setMsgSn(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
+        idx += 4;
+        messageHead.setMsgId(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,2)));
+        idx += 2;
+        messageHead.setMsgGnssCenterId(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
+        idx += 4;
+        messageHead.setVersionFlag(ByteArrayUtil.subBytes(fullPacket,idx,3));
+        idx += 3;
+        messageHead.setEncrypyFlag(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,1)));
+        idx += 1;
+        messageHead.setEncrypyKey(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
+        message.setMsgHead(messageHead);
+        idx += 4;
+        int dataLen = getMsgBodyLen(fullPacket);
+        message.setMsgBody(ByteArrayUtil.subBytes(fullPacket,idx,dataLen));
+        idx += dataLen;
+        message.setCrcCode(ByteArrayUtil.subBytes(fullPacket,idx,2));
+        idx += 2;
+        message.setEndFlag(fullPacket[fullPacket.length - 1]);
+        idx += 1;
 
-        return messageHead;
+        return message;
     }
 
     /**
@@ -96,8 +115,8 @@ public class PacketUtil {
      * @return
      */
     public static int getPacketLen(byte[] realBytes){
-        //完整数据长度 == （数据长度 = 头标识 + 数据头 + 数据体 + 尾标识）+ （CRC = 2）
-        return ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,1,4)) + 2;
+        //完整数据长度 == （数据长度 = 头标识 + 数据头 + 数据体 + 尾标识）
+        return ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(realBytes,1,4));
     }
 
     /**

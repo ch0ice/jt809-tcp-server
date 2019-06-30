@@ -26,6 +26,7 @@ public class CommonHandlerFactory implements ApplicationContextAware {
     @PostConstruct
     public void serverHandlerFactory() {
         handlers.put(JT809DataTypeConstants.UP_CONNECT_REQ,context.getBean(UpConnectHandler.class));
+        handlers.put(JT809DataTypeConstants.UP_EXG_MSG,context.getBean(UpExgMsgHandler.class));
     }
 
     @Override
