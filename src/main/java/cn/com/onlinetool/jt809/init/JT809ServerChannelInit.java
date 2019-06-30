@@ -1,8 +1,9 @@
 package cn.com.onlinetool.jt809.init;
 
 import cn.com.onlinetool.jt809.config.NettyConfig;
-import cn.com.onlinetool.jt809.decoder.Byte2ByteDecoder;
+import cn.com.onlinetool.jt809.decoder.Byte2MessageDecoder;
 import cn.com.onlinetool.jt809.encoder.Message2ByteEncoder;
+import cn.com.onlinetool.jt809.encoder.String2ByteEncoder;
 import cn.com.onlinetool.jt809.handler.JT809ServerHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -28,7 +29,8 @@ public class JT809ServerChannelInit extends ChannelInitializer<SocketChannel> {
     public void initChannel(SocketChannel socketChannel) throws Exception {
         socketChannel.pipeline().addLast(new IdleStateHandler(nettyConfig.getReaderIdleTimeSeconds(),0,0));
         socketChannel.pipeline().addLast(new Message2ByteEncoder());
-        socketChannel.pipeline().addLast(new Byte2ByteDecoder());
+        socketChannel.pipeline().addLast(new String2ByteEncoder());
+        socketChannel.pipeline().addLast(new Byte2MessageDecoder());
         socketChannel.pipeline().addLast(jt809ServerHandler);
     }
 }

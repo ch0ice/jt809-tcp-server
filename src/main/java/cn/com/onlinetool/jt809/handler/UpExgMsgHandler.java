@@ -43,6 +43,8 @@ public class UpExgMsgHandler implements CommonHandler{
                 break;
             default:
         }
+        //测试响应
+        ctx.writeAndFlush(msg);
     }
 
 

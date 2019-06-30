@@ -50,7 +50,7 @@ public class JT809Server {
             //ChannelFuture描述异步回调的处理操作
             ChannelFuture future = serverBootstrap.bind(nettyConfig.getTcpPort()).sync();
 
-            logger.warn("nettyServer run success,TCP-PORT:{}",nettyConfig.getTcpPort());
+            logger.info("nettyServer run success,TCP-PORT:{}",nettyConfig.getTcpPort());
 
             //等待socket被关闭
             future.channel().closeFuture().sync();

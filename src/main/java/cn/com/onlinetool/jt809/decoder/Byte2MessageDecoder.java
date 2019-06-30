@@ -20,8 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2018-12-27 14:39
  *
  */
-public class Byte2ByteDecoder extends ByteToMessageDecoder {
-    private Logger logger = LoggerFactory.getLogger(Byte2ByteDecoder.class);
+public class Byte2MessageDecoder extends ByteToMessageDecoder {
+    private Logger logger = LoggerFactory.getLogger(Byte2MessageDecoder.class);
     private static Map<String, byte[]> cache = new ConcurrentHashMap<String, byte[]>();
 
     @Override
@@ -38,7 +38,6 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
         msg.readBytes(readDatas);
         logger.info("接收到数据包, packetLen : {}, packet : {}",readDatas.length, ByteArrayUtil.bytes2HexStr(readDatas));
 
-
         //拼接缓存数据
         byte[] cacheDatas = cache.get(channelKey);
         if(null != cacheDatas){
@@ -47,10 +46,19 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
             logger.info("拼接后的数据包：{}",ByteArrayUtil.bytes2HexStr(readDatas));
         }
 
+        //校验数据头
+        if(!PacketUtil.checkHeadFlag(readDatas)){
+            //防止极端情况，请求头校验不通过的情况 丢掉本包数据 同时 丢掉上一包缓存的剩余数据
+            //防止上一包剩余数据不包含数据起始符 会导致拼接后的数据包一直校验不通过
+            cache.remove(channelKey);
+            logger.warn("数据包标识符验证失败 : {}",ByteArrayUtil.bytes2HexStr(readDatas));
+            return;
+        }
+
+        //数据转义
         byte[] head = new byte[]{readDatas[0]};
         byte[] tail = new byte[]{readDatas[readDatas.length - 1]};
         byte[] body = ByteArrayUtil.subBytes(readDatas,1,readDatas.length - 2);
-        //数据转义
         String dataStr = ByteArrayUtil.bytes2FullHexStr(body);
         dataStr = dataStr.replaceAll("0x5a0x01","0x5b");
         dataStr = dataStr.replaceAll("0x5a0x02","0x5a");
@@ -68,10 +76,8 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
             return;
         }
 
-        //整包长度
-        int packetLen = PacketUtil.getPacketLen(readDatas);
-
         //判断是否有完整数据包，没有直接缓存
+        int packetLen = PacketUtil.getPacketLen(readDatas);
         if(readDatas.length < packetLen){
             logger.warn("数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(readDatas));
             cache.put(channelKey,readDatas);
@@ -93,57 +99,56 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
      * @param out
      */
     private void parseAndPushData(String channelKey,byte[] readDatas,int index,List<Object> out){
-        if(PacketUtil.checkHeadFlag(readDatas)){
-            //整包长度
-            int packetLen = PacketUtil.getPacketLen(readDatas);
-            //验证数据包有效性
-            if(PacketUtil.checkPacket(readDatas)){
-                //一个完整包
-                byte[] fullPacket = ByteArrayUtil.subBytes(readDatas,index,packetLen);
-                logger.info("拆包后的单包数据 --> baseData : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
-                out.add(PacketUtil.bytes2Message(fullPacket));
-                index += packetLen;
-                //终端成功响应
-//                byte[] result = new byte[9];
-//                ctx.writeAndFlush(result);
-            }else{
-                //终端错误响应
-//                byte[] result = new byte[9];
-//                ctx.writeAndFlush(result);
-            }
-
-            //剩余长度
-            int remainingLen = readDatas.length - index;
-
-            //没有数据，结束
-            if(remainingLen < 1){
-                return;
-            }
-
-            //剩余数据长度小于一包数据的最小长度，缓存数据
-            if(remainingLen < JT809Constants.MSG_MIN_LEN) {
-                logger.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
-                cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
-                return;
-            }
-
-            //下一包数据的总长度
-            packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(readDatas,index,readDatas.length));
-            //剩余数据长度小于整包数据长度
-            if(remainingLen < packetLen){
-                logger.warn("剩余数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
-                cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
-                return;
-            }
-
-            //还有完整数据包 递归调用
-            this.parseAndPushData(channelKey,readDatas,index,out);
-
-        } else if(null != cache.get(channelKey)){
-            logger.warn("数据包标识符验证失败 : {}",ByteArrayUtil.bytes2HexStr(readDatas));
+        //校验数据头 防止递归调用失败
+        if(!PacketUtil.checkHeadFlag(readDatas)){
             //防止极端情况，请求头校验不通过的情况 丢掉本包数据 同时 丢掉上一包缓存的剩余数据
             //防止上一包剩余数据不包含数据起始符 会导致拼接后的数据包一直校验不通过
             cache.remove(channelKey);
+            logger.warn("数据包标识符验证失败 : {}",ByteArrayUtil.bytes2HexStr(readDatas));
+            return;
         }
+
+        //整包长度
+        int packetLen = PacketUtil.getPacketLen(readDatas);
+
+        //一个完整包
+        byte[] fullPacket = ByteArrayUtil.subBytes(readDatas,index,packetLen);
+        logger.info("拆包后的单包数据 --> fullPacket : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
+        //验证数据包有效性
+        if(!PacketUtil.checkPacket(fullPacket)){
+            logger.info("数据校验失败 --> fullPacket : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
+            return;
+        }
+        out.add(PacketUtil.bytes2Message(fullPacket));
+        index += packetLen;
+
+        //剩余长度
+        int remainingLen = readDatas.length - index;
+
+        //没有数据，结束
+        if(remainingLen < 1){
+            return;
+        }
+
+        //剩余数据长度小于一包数据的最小长度，缓存数据
+        if(remainingLen < JT809Constants.MSG_MIN_LEN) {
+            logger.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
+            cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
+            return;
+        }
+
+        //下一包数据的总长度
+        packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(readDatas,index,readDatas.length - index));
+        //剩余数据长度小于整包数据长度
+        if(remainingLen < packetLen){
+            logger.warn("剩余数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
+            cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
+            return;
+        }
+
+        //还有完整数据包 递归调用
+        this.parseAndPushData(channelKey,readDatas,index,out);
+
+
     }
 }
