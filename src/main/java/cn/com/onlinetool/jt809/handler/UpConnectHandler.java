@@ -34,7 +34,7 @@ public class UpConnectHandler implements CommonHandler {
         req.setPassword(password);
         req.setDownLinkIp(downLinkIp);
         req.setDownLinkPort(downLinkPort);
-        loginHandler(req);
+        this.login(req);
 
     }
 
@@ -42,7 +42,7 @@ public class UpConnectHandler implements CommonHandler {
      * 登陆逻辑处理
      * @param msg
      */
-    private void loginHandler(UpConnectReq msg){
+    private void login(UpConnectReq msg){
         log.info("登陆请求信息：" + JSONObject.toJSONString(msg));
 
     }
