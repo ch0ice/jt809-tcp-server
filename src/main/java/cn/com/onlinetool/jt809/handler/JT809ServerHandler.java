@@ -1,9 +1,8 @@
-package cn.com.onlinetool.jt809.adapter;
+package cn.com.onlinetool.jt809.handler;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.config.BusinessConfig;
 import cn.com.onlinetool.jt809.config.NettyConfig;
-import cn.com.onlinetool.jt809.handler.CommonHandlerFactory;
 import cn.com.onlinetool.jt809.manage.TcpChannelMsgManage;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,7 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author choice
@@ -26,8 +28,8 @@ import java.util.concurrent.*;
  */
 @Service
 @ChannelHandler.Sharable
-public class JT809ServerAdapter extends ChannelInboundHandlerAdapter {
-    private Logger logger = LoggerFactory.getLogger(JT809ServerAdapter.class);
+public class JT809ServerHandler extends ChannelInboundHandlerAdapter {
+    private Logger logger = LoggerFactory.getLogger(JT809ServerHandler.class);
 
     @Autowired
     NettyConfig nettyConfig;

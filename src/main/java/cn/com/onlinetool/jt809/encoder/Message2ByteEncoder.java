@@ -10,7 +10,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * @date 2018-12-27 15:09
  *
  */
-public class CommonPacket2ByteEncoder extends MessageToByteEncoder<Object> {
+public class Message2ByteEncoder extends MessageToByteEncoder<Object> {
     @Override
     public void encode(ChannelHandlerContext ctx, Object msg, ByteBuf byteBuf) throws Exception {
 

@@ -47,18 +47,19 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
             logger.info("拼接后的数据包：{}",ByteArrayUtil.bytes2HexStr(readDatas));
         }
 
-        byte[] h = new byte[]{readDatas[0]};
-        byte[] l = new byte[]{readDatas[readDatas.length - 1]};
-        byte[] a = ByteArrayUtil.subBytes(readDatas,1,readDatas.length - 2);
+        byte[] head = new byte[]{readDatas[0]};
+        byte[] tail = new byte[]{readDatas[readDatas.length - 1]};
+        byte[] body = ByteArrayUtil.subBytes(readDatas,1,readDatas.length - 2);
         //数据转义
-        String dataStr = ByteArrayUtil.bytes2FullHexStr(a);
+        String dataStr = ByteArrayUtil.bytes2FullHexStr(body);
         dataStr = dataStr.replaceAll("0x5a0x01","0x5b");
         dataStr = dataStr.replaceAll("0x5a0x02","0x5a");
         dataStr = dataStr.replaceAll("0x5e0x01","0x5d");
         dataStr = dataStr.replaceAll("0x5e0x02","0x5e");
-        a = ByteArrayUtil.fullHexStr2Bytes(dataStr);
-        a = ByteArrayUtil.append(h,a);
-        readDatas = ByteArrayUtil.append(a,l);
+        body = ByteArrayUtil.fullHexStr2Bytes(dataStr);
+        body = ByteArrayUtil.append(head,body);
+        readDatas = ByteArrayUtil.append(body,tail);
+        logger.info("转义后的数据包：{}",ByteArrayUtil.bytes2HexStr(readDatas));
 
         //如果数据小于一整包数据的最小长度
         if(readDatas.length < JT809Constants.MSG_MIN_LEN){
@@ -69,6 +70,7 @@ public class Byte2ByteDecoder extends ByteToMessageDecoder {
 
         //整包长度
         int packetLen = PacketUtil.getPacketLen(readDatas);
+
         //判断是否有完整数据包，没有直接缓存
         if(readDatas.length < packetLen){
             logger.warn("数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(readDatas));

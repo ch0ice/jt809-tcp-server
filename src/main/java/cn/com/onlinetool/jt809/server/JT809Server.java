@@ -8,6 +8,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,10 +42,10 @@ public class JT809Server {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             //设置要使用的线程池以及当前的Channel 的类型
             serverBootstrap.group(boosGroup,workGroup).channel(NioServerSocketChannel.class);
+            serverBootstrap.handler(new LoggingHandler(LogLevel.INFO));
             //接收到的信息处理器
             serverBootstrap.childHandler(JT809ServerChannelInit);
-            //可以直接利用常量进行TCP协议的相关配置
-            serverBootstrap.option(ChannelOption.SO_BACKLOG,128);
+            serverBootstrap.option(ChannelOption.SO_BACKLOG,1024);
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE,true);
             //ChannelFuture描述异步回调的处理操作
             ChannelFuture future = serverBootstrap.bind(nettyConfig.getTcpPort()).sync();
@@ -54,6 +56,7 @@ public class JT809Server {
             future.channel().closeFuture().sync();
         } catch (Exception e){
             logger.error("nettyServer run fail");
+            e.printStackTrace();
         } finally {
             workGroup.shutdownGracefully();
             boosGroup.shutdownGracefully();

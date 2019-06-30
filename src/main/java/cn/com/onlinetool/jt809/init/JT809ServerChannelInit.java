@@ -1,12 +1,11 @@
 package cn.com.onlinetool.jt809.init;
 
-import cn.com.onlinetool.jt809.encoder.CommonPacket2ByteEncoder;
-import cn.com.onlinetool.jt809.adapter.JT809ServerAdapter;
 import cn.com.onlinetool.jt809.config.NettyConfig;
 import cn.com.onlinetool.jt809.decoder.Byte2ByteDecoder;
+import cn.com.onlinetool.jt809.encoder.Message2ByteEncoder;
+import cn.com.onlinetool.jt809.handler.JT809ServerHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,15 +21,14 @@ public class JT809ServerChannelInit extends ChannelInitializer<SocketChannel> {
     @Autowired
     NettyConfig nettyConfig;
     @Autowired
-    JT809ServerAdapter JT809ServerAdapter;
+    JT809ServerHandler jt809ServerHandler;
 
 
     @Override
     public void initChannel(SocketChannel socketChannel) throws Exception {
-        socketChannel.pipeline().addLast(new LoggingHandler());
         socketChannel.pipeline().addLast(new IdleStateHandler(nettyConfig.getReaderIdleTimeSeconds(),0,0));
-        socketChannel.pipeline().addLast(new CommonPacket2ByteEncoder());
+        socketChannel.pipeline().addLast(new Message2ByteEncoder());
         socketChannel.pipeline().addLast(new Byte2ByteDecoder());
-        socketChannel.pipeline().addLast(JT809ServerAdapter);
+        socketChannel.pipeline().addLast(jt809ServerHandler);
     }
 }
