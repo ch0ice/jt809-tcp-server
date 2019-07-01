@@ -106,6 +106,15 @@ public class ByteArrayUtil {
     }
 
     /**
+     * byte[] 转换为 GBK 编码的 字符串
+     * @param byteArray
+     * @return
+     */
+    public static String bytes2gbkString(byte[] byteArray) {
+        return bytes2string(byteArray,"GBK");
+    }
+
+    /**
      * byte[] 转换为 string
      * @param byteArray
      * @param charset
@@ -129,6 +138,7 @@ public class ByteArrayUtil {
         }
         return new String(byteArray, Charset.defaultCharset());
     }
+
 
     /**
      * byte[] to float
@@ -190,7 +200,7 @@ public class ByteArrayUtil {
             if (sTemp.length() < 2){
                 sb.append(0);
             }
-            sb.append(sTemp.toUpperCase());
+            sb.append(sTemp);
             if(i < array.length-1){
                 sb.append("0x");
             }
@@ -220,7 +230,7 @@ public class ByteArrayUtil {
      * @return byte[]
      */
     public static byte[] fullHexStr2Bytes(String hex){
-        hex = hex.toLowerCase().replaceAll("0x","").trim();
+        hex = hex.toLowerCase().replaceAll("0x","").trim().toUpperCase();
         return hexStr2Bytes(hex);
     }
 

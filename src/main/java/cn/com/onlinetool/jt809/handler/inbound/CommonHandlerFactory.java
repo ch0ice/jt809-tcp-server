@@ -1,4 +1,4 @@
-package cn.com.onlinetool.jt809.handler;
+package cn.com.onlinetool.jt809.handler.inbound;
 
 
 import cn.com.onlinetool.jt809.constants.JT809DataTypeConstants;

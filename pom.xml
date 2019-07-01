@@ -57,6 +57,7 @@
         <spring-kafka>2.2.7.RELEASE</spring-kafka>
         <junit>4.12</junit>
         <junit-jupiter>5.4.2</junit-jupiter>
+        <maven-surefire>2.22.2</maven-surefire>
     </properties>
 
     <dependencies>
@@ -134,12 +135,6 @@
             <version>${fastjson}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython-standalone</artifactId>
-            <version>2.7.1</version>
-        </dependency>
-
 
     </dependencies>
 
@@ -152,23 +147,18 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot-starter}</version>
                 <configuration>
-                    <finalName>${project.name}</finalName>
+                    <finalName>${project.name}-${project.version}</finalName>
                     <classifier>boot</classifier>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <!-- 包含 -->
-                    <includes>
-                    </includes>
-                    <!-- 排除 -->
-                    <excludes>
-                        <exclude>**/server/*.java</exclude>
-                    </excludes>
-                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

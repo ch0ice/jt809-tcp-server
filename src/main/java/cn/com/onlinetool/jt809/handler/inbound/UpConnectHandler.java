@@ -1,4 +1,4 @@
-package cn.com.onlinetool.jt809.handler;
+package cn.com.onlinetool.jt809.handler.inbound;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpConnectReq;
@@ -25,9 +25,9 @@ public class UpConnectHandler implements CommonHandler {
     @Override
     public void handler(ChannelHandlerContext ctx, Message msg) {
         int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),0,4));
-        String password = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),4,8));
-        String downLinkIp = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),12,32));
-        String downLinkPort = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),44,2));
+        String password = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),4,8));
+        String downLinkIp = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),12,32));
+        String downLinkPort = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),44,2));
 
         UpConnectReq req = new UpConnectReq();
         req.setUserId(userId);
@@ -35,6 +35,7 @@ public class UpConnectHandler implements CommonHandler {
         req.setDownLinkIp(downLinkIp);
         req.setDownLinkPort(downLinkPort);
         this.login(req);
+        this.loginRes(ctx,msg);
 
     }
 
@@ -44,6 +45,18 @@ public class UpConnectHandler implements CommonHandler {
      */
     private void login(UpConnectReq msg){
         log.info("登陆请求信息：" + JSONObject.toJSONString(msg));
+        if(123456 == msg.getUserId() && "jt809test".equals(msg.getPassword())){
+            log.info("登陆成功");
+        }
+    }
 
+    /**
+     * 登陆响应处理
+     * @param ctx
+     * @param msg
+     */
+    private void loginRes(ChannelHandlerContext ctx, Message msg){
+        //测试响应
+        ctx.writeAndFlush(msg);
     }
 }

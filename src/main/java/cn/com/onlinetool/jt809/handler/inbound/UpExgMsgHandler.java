@@ -1,4 +1,4 @@
-package cn.com.onlinetool.jt809.handler;
+package cn.com.onlinetool.jt809.handler.inbound;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpExgMsg;
@@ -23,28 +23,34 @@ public class UpExgMsgHandler implements CommonHandler{
 
     @Override
     public void handler(ChannelHandlerContext ctx, Message msg) {
-        String vehicleNo = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getMsgBody(),0,21));
-        int vehicleColor = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),21,1));
-        int dataType = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),22,2));
-        int dataLen = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),24,4));
-        byte[] data = ByteArrayUtil.subBytes(msg.getMsgBody(),28,msg.getMsgBody().length - 28 - 1);
+        int index = 0;
+        String vehicleNo = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,21));
+        index += 21;
+        int vehicleColor = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,1));
+        index += 1;
+        int dataType = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,2));
+        index += 2;
+        int dataLen = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,4));
+        index += 4;
+        byte[] data = ByteArrayUtil.subBytes(msg.getMsgBody(),index,dataLen);
+        index += dataLen;
         UpExgMsg upExgMsg = new UpExgMsg();
         upExgMsg.setVehicleNo(vehicleNo);
         upExgMsg.setVehicleColor(vehicleColor);
         upExgMsg.setDataType(dataType);
         upExgMsg.setDataLen(dataLen);
         upExgMsg.setData(data);
+        log.info("车辆动态信息交换信息：" + JSONObject.toJSONString(upExgMsg));
         switch (dataType){
-            case UpExgConstants.UP_EXG_MSG_REGISTER:
+            case UpExg.UP_EXG_MSG_REGISTER:
                 upExgRegisterHandler(upExgMsg);
                 break;
-            case UpExgConstants.UP_EXG_MSG_REAL_LOCATION:
+            case UpExg.UP_EXG_MSG_REAL_LOCATION:
                 upExgMsgRealLocationHandler(upExgMsg);
                 break;
             default:
         }
-        //测试响应
-        ctx.writeAndFlush(msg);
+
     }
 
 
@@ -54,15 +60,15 @@ public class UpExgMsgHandler implements CommonHandler{
      */
     private void upExgRegisterHandler(UpExgMsg msg){
         int index = 0;
-        String platformId = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getData(),index,11));
+        String platformId = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getData(),index,11));
         index += 11;
-        String producerId = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getData(),index,11));
+        String producerId = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getData(),index,11));
         index += 11;
-        String terminalModelType = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getData(),index,8));
+        String terminalModelType = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getData(),index,8));
         index += 8;
-        String terminalId = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getData(),index,7));
+        String terminalId = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getData(),index,7));
         index += 7;
-        String terminalSimCode = ByteArrayUtil.bytes2string(ByteArrayUtil.subBytes(msg.getData(),index,12));
+        String terminalSimCode = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getData(),index,12));
         index += 12;
 
         UpExgMsg.UpExgMsgRegister register = new UpExgMsg.UpExgMsgRegister();
@@ -119,8 +125,6 @@ public class UpExgMsgHandler implements CommonHandler{
         location.setAlarm(alarm);
         msg.setUpExgMsgRealLocation(location);
         log.info("车辆实时定位信息：" + JSONObject.toJSONString(location));
-
-
     }
 
 }

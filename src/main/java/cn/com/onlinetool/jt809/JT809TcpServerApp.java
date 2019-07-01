@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
  * @author choice
  */
 @SpringBootApplication
-@EnableKafka
+//@EnableKafka
 public class JT809TcpServerApp {
 
     @Bean

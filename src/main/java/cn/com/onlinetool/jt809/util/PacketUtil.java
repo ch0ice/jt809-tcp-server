@@ -1,8 +1,7 @@
 package cn.com.onlinetool.jt809.util;
 
 import cn.com.onlinetool.jt809.bean.Message;
-import cn.com.onlinetool.jt809.bean.MessageHead;
-import cn.com.onlinetool.jt809.constants.JT809Constants;
+import cn.com.onlinetool.jt809.constants.JT809MessageConstants;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -74,20 +73,20 @@ public class PacketUtil {
         int idx = 0;
         message.setHeadFlag(fullPacket[0]);
         idx += 1;
-        MessageHead messageHead = new MessageHead();
+        Message.MessageHead messageHead = new Message.MessageHead();
         messageHead.setMsgLength(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
         idx += 4;
         messageHead.setMsgSn(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
         idx += 4;
-        messageHead.setMsgId(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,2)));
+        messageHead.setMsgId(ByteArrayUtil.bytes2Short(ByteArrayUtil.subBytes(fullPacket,idx,2)));
         idx += 2;
         messageHead.setMsgGnssCenterId(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
         idx += 4;
         messageHead.setVersionFlag(ByteArrayUtil.subBytes(fullPacket,idx,3));
         idx += 3;
-        messageHead.setEncrypyFlag(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,1)));
+        messageHead.setEncryptFlag(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,1)));
         idx += 1;
-        messageHead.setEncrypyKey(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
+        messageHead.setEncryptKey(ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(fullPacket,idx,4)));
         message.setMsgHead(messageHead);
         idx += 4;
         int dataLen = getMsgBodyLen(fullPacket);
@@ -107,7 +106,7 @@ public class PacketUtil {
      * @return
      */
     public static boolean checkHeadFlag(byte[] realBytes){
-        return JT809Constants.MSG_HEAD == realBytes[0];
+        return JT809MessageConstants.MSG_HEAD == realBytes[0];
     }
 
     /**

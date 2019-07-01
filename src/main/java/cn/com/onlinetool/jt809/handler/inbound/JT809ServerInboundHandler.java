@@ -1,4 +1,4 @@
-package cn.com.onlinetool.jt809.handler;
+package cn.com.onlinetool.jt809.handler.inbound;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.config.BusinessConfig;
@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 @ChannelHandler.Sharable
-public class JT809ServerHandler extends ChannelInboundHandlerAdapter {
-    private Logger logger = LoggerFactory.getLogger(JT809ServerHandler.class);
+public class JT809ServerInboundHandler extends ChannelInboundHandlerAdapter {
+    private Logger logger = LoggerFactory.getLogger(JT809ServerInboundHandler.class);
 
     @Autowired
     NettyConfig nettyConfig;
@@ -87,7 +87,7 @@ public class JT809ServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         businessExecutor.submit(() -> {
             Message message = (Message) msg;
-            handlerFactory.getHandler(message.getMsgHead().getMsgId()).handler(ctx,message);
+            handlerFactory.getHandler((int)message.getMsgHead().getMsgId()).handler(ctx,message);
         });
     }
 

@@ -35,7 +35,7 @@ public final class JT809DataTypeConstants {
      * 主链路动态信息交换消息
      */
     public final static int UP_EXG_MSG = 0x1200;
-    public final static class UpExgConstants {
+    public final static class UpExg {
         /**
          * 上传车辆注册信息
          */

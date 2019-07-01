@@ -13,9 +13,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public final class Message {
-    private byte headFlag;
+    private int headFlag;
     private MessageHead msgHead;
     private byte[] msgBody;
     private byte[] crcCode;
-    private byte endFlag;
+    private int endFlag;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static final class MessageHead {
+        private int msgLength;
+        private int msgSn;
+        private short msgId;
+        private int msgGnssCenterId;
+        private byte[] versionFlag;
+        private int encryptFlag;
+        private int encryptKey;
+    }
 }

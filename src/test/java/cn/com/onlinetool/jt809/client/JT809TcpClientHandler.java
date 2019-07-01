@@ -19,7 +19,7 @@ public class JT809TcpClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("channelRead..........");
+        System.out.println("channelRead.........." + ByteArrayUtil.bytes2HexStr((byte[])msg));
     }
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

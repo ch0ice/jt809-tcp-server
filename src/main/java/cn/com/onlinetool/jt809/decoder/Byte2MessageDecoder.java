@@ -1,7 +1,7 @@
 package cn.com.onlinetool.jt809.decoder;
 
 
-import cn.com.onlinetool.jt809.constants.JT809Constants;
+import cn.com.onlinetool.jt809.constants.JT809MessageConstants;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import cn.com.onlinetool.jt809.util.PacketUtil;
 import io.netty.buffer.ByteBuf;
@@ -56,21 +56,16 @@ public class Byte2MessageDecoder extends ByteToMessageDecoder {
         }
 
         //数据转义
-        byte[] head = new byte[]{readDatas[0]};
-        byte[] tail = new byte[]{readDatas[readDatas.length - 1]};
-        byte[] body = ByteArrayUtil.subBytes(readDatas,1,readDatas.length - 2);
-        String dataStr = ByteArrayUtil.bytes2FullHexStr(body);
+        String dataStr = ByteArrayUtil.bytes2FullHexStr(readDatas);
         dataStr = dataStr.replaceAll("0x5a0x01","0x5b");
         dataStr = dataStr.replaceAll("0x5a0x02","0x5a");
         dataStr = dataStr.replaceAll("0x5e0x01","0x5d");
         dataStr = dataStr.replaceAll("0x5e0x02","0x5e");
-        body = ByteArrayUtil.fullHexStr2Bytes(dataStr);
-        body = ByteArrayUtil.append(head,body);
-        readDatas = ByteArrayUtil.append(body,tail);
+        readDatas = ByteArrayUtil.fullHexStr2Bytes(dataStr);
         logger.info("转义后的数据包：{}",ByteArrayUtil.bytes2HexStr(readDatas));
 
         //如果数据小于一整包数据的最小长度
-        if(readDatas.length < JT809Constants.MSG_MIN_LEN){
+        if(readDatas.length < JT809MessageConstants.MSG_MIN_LEN){
             logger.warn("数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(readDatas));
             cache.put(channelKey,readDatas);
             return;
@@ -131,7 +126,7 @@ public class Byte2MessageDecoder extends ByteToMessageDecoder {
         }
 
         //剩余数据长度小于一包数据的最小长度，缓存数据
-        if(remainingLen < JT809Constants.MSG_MIN_LEN) {
+        if(remainingLen < JT809MessageConstants.MSG_MIN_LEN) {
             logger.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
             cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
             return;
