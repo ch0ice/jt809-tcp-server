@@ -67,10 +67,10 @@ public class Byte2MessageInboundHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
         //计数器减1
         tcpChannelMsgManage.decrementTcpClientConnectNum();
         log.info("断开客户端连接,客户端信息 : {}",ctx.channel().remoteAddress().toString());
+        super.channelInactive(ctx);
     }
 
     @Override
