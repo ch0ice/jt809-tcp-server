@@ -50,7 +50,6 @@ public class UpExgMsgHandler implements CommonHandler{
                 break;
             default:
         }
-        ctx.writeAndFlush(msg);
 
     }
 
