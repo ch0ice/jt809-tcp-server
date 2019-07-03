@@ -11,8 +11,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +21,9 @@ import org.springframework.stereotype.Service;
  * @date 2018-12-27 12:52
  *
  */
+@Slf4j
 @Service
 public class JT809Server {
-    private Logger logger = LoggerFactory.getLogger(JT809Server.class);
-
     @Autowired
     private NettyConfig nettyConfig;
     @Autowired
@@ -50,12 +48,12 @@ public class JT809Server {
             //ChannelFuture描述异步回调的处理操作
             ChannelFuture future = serverBootstrap.bind(nettyConfig.getTcpPort()).sync();
 
-            logger.info("nettyServer run success,TCP-PORT:{}",nettyConfig.getTcpPort());
+            log.info("nettyServer run success,TCP-PORT:{}",nettyConfig.getTcpPort());
 
             //等待socket被关闭
             future.channel().closeFuture().sync();
         } catch (Exception e){
-            logger.error("nettyServer run fail");
+            log.error("nettyServer run fail");
             e.printStackTrace();
         } finally {
             workGroup.shutdownGracefully();

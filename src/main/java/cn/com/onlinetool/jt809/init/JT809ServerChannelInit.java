@@ -2,7 +2,6 @@ package cn.com.onlinetool.jt809.init;
 
 import cn.com.onlinetool.jt809.config.NettyConfig;
 import cn.com.onlinetool.jt809.handler.inbound.Byte2MessageInboundHandler;
-import cn.com.onlinetool.jt809.handler.inbound.JT809ServerInboundHandler;
 import cn.com.onlinetool.jt809.handler.inbound.MessageForwardInboundHandler;
 import cn.com.onlinetool.jt809.handler.outbound.Message2ByteOutboundHandler;
 import io.netty.channel.ChannelInitializer;
@@ -25,8 +24,6 @@ public class JT809ServerChannelInit extends ChannelInitializer<SocketChannel> {
     Byte2MessageInboundHandler byte2MessageInboundHandler;
     @Autowired
     MessageForwardInboundHandler messageForwardInboundHandler;
-    @Autowired
-    JT809ServerInboundHandler jt809ServerInboundHandler;
     @Autowired
     Message2ByteOutboundHandler message2ByteOutboundHandler;
 

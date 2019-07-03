@@ -5,8 +5,7 @@ import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -28,12 +27,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2019-01-10 11:38
  *
  */
+@Slf4j
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Component
 public class TcpChannelMsgManage {
-    Logger logger = LoggerFactory.getLogger(TcpChannelMsgManage.class);
 
     @Value("${server.port}")
     private String serverPort;
@@ -124,7 +123,7 @@ public class TcpChannelMsgManage {
             addr = InetAddress.getLocalHost();
             return addr.getHostAddress();
         } catch (UnknownHostException e) {
-            logger.error("获取本机ip失败",e);
+            log.error("获取本机ip失败",e);
         }
         return null;
     }
