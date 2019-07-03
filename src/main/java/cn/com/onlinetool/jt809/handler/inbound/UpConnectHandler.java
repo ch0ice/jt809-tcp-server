@@ -38,10 +38,11 @@ public class UpConnectHandler implements CommonHandler {
         int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,4));
         index += 4;
         String password = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,8));
+        byte[] bytePassword = ByteArrayUtil.subBytes(msg.getMsgBody(),index,8);
         index += 8;
         String downLinkIp = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,32));
         index += 32;
-        String downLinkPort = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,2));
+        int downLinkPort = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,2));
         index += 2;
 
         UpConnectReq req = new UpConnectReq();
@@ -52,8 +53,9 @@ public class UpConnectHandler implements CommonHandler {
         log.info("登陆请求信息：" + JSONObject.toJSONString(req));
 
         int testUser = 123456;
-        String testPass = "jt809test";
-        if(testUser == req.getUserId() && testPass.equals(req.getPassword())){
+        String testPass = "test809";
+        byte[] byteTestPass = ByteArrayUtil.append(testPass.getBytes(),new byte[8 - testPass.getBytes().length]);
+        if(testUser == req.getUserId() && ByteArrayUtil.bytes2HexStr(byteTestPass).equals(ByteArrayUtil.bytes2HexStr(bytePassword))){
             log.info("登陆成功");
             byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.SUCCESS};
             byte[] verifyCode = new byte[4];
@@ -85,7 +87,7 @@ public class UpConnectHandler implements CommonHandler {
             msg.setMsgBody(result);
             ctx.writeAndFlush(msg);
         }
-        else if(testPass.equals(req.getPassword())){
+        else if(ByteArrayUtil.bytes2HexStr(byteTestPass).equals(ByteArrayUtil.bytes2HexStr(bytePassword))){
             log.info("密码错误");
             byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.PASSWORD_ERROR};
             byte[] verifyCode = new byte[4];

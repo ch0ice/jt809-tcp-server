@@ -78,7 +78,7 @@ public class Byte2MessageDecoder{
         }
 
         //解析数据
-        this.parseAndPushData(ctx,channelKey,readDatas, 0);
+        this.parseAndPushData(ctx,channelKey,readDatas);
 
         msg.release();
     }
@@ -88,9 +88,8 @@ public class Byte2MessageDecoder{
      * 解析并返回数据
      * @param channelKey
      * @param readDatas
-     * @param index
      */
-    private void parseAndPushData(ChannelHandlerContext ctx,String channelKey,byte[] readDatas,int index){
+    private void parseAndPushData(ChannelHandlerContext ctx,String channelKey,byte[] readDatas){
         //校验数据头 防止递归调用失败
         if(!PacketUtil.checkHeadFlag(readDatas)){
             //防止极端情况，请求头校验不通过的情况 丢掉本包数据 同时 丢掉上一包缓存的剩余数据
@@ -104,7 +103,7 @@ public class Byte2MessageDecoder{
         int packetLen = PacketUtil.getPacketLen(readDatas);
 
         //一个完整包
-        byte[] fullPacket = ByteArrayUtil.subBytes(readDatas,index,packetLen);
+        byte[] fullPacket = ByteArrayUtil.subBytes(readDatas,0,packetLen);
         log.info("拆包后的单包数据 --> fullPacket : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
         //验证数据包有效性
         if(!PacketUtil.checkPacket(fullPacket)){
@@ -112,10 +111,9 @@ public class Byte2MessageDecoder{
             return;
         }
         ctx.fireChannelRead(PacketUtil.bytes2Message(fullPacket));
-        index += packetLen;
 
         //剩余长度
-        int remainingLen = readDatas.length - index;
+        int remainingLen = readDatas.length - packetLen;
 
         //没有数据，结束
         if(remainingLen < 1){
@@ -124,22 +122,22 @@ public class Byte2MessageDecoder{
 
         //剩余数据长度小于一包数据的最小长度，缓存数据
         if(remainingLen < JT809MessageConstants.MSG_MIN_LEN) {
-            log.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
-            cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
+            log.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,0,remainingLen)));
+            cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,0,remainingLen));
             return;
         }
 
         //下一包数据的总长度
-        packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(readDatas,index,readDatas.length - index));
+        packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(readDatas,0,readDatas.length));
         //剩余数据长度小于整包数据长度
         if(remainingLen < packetLen){
-            log.warn("剩余数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,index,remainingLen)));
-            cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,index,remainingLen));
+            log.warn("剩余数据长度小于整包数据长度，缓存数据：{}",ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(readDatas,0,remainingLen)));
+            cache.put(channelKey,ByteArrayUtil.subBytes(readDatas,0,remainingLen));
             return;
         }
 
         //还有完整数据包 递归调用
-        this.parseAndPushData(ctx,channelKey,readDatas,index);
+        this.parseAndPushData(ctx,channelKey,ByteArrayUtil.subBytes(readDatas,0,remainingLen));
 
 
     }

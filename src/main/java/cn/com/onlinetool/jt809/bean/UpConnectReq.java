@@ -17,5 +17,5 @@ public class UpConnectReq {
     private int userId;
     private String password;
     private String downLinkIp;
-    private String downLinkPort;
+    private int downLinkPort;
 }
