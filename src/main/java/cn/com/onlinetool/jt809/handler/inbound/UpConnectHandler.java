@@ -69,7 +69,7 @@ public class UpConnectHandler implements CommonHandler {
             msg.setMsgBody(result);
             ctx.writeAndFlush(msg);
         }
-        else if(111 == msg.getMsgHead().getMsgGnssCenterId()){
+        else if(111 != msg.getMsgHead().getMsgGnssCenterId()){
             log.info("接入码不正确");
             byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.GUSSCENTERID_ERROR};
             byte[] verifyCode = new byte[4];
