@@ -4,8 +4,8 @@ import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToByteEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * @author choice
@@ -14,9 +14,10 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class Message2ByteEncoder extends MessageToByteEncoder<Message> {
-    @Override
-    public void encode(ChannelHandlerContext ctx, Message msg, ByteBuf byteBuf) throws Exception {
+@Service
+public class Message2ByteEncoder {
+    public void encode(ChannelHandlerContext ctx, Message msg) throws Exception {
+        ByteBuf byteBuf = ctx.alloc().buffer();
         //headFlag
         byteBuf.writeByte(msg.getHeadFlag());
         //dataHead
@@ -38,6 +39,6 @@ public class Message2ByteEncoder extends MessageToByteEncoder<Message> {
         byteBuf.writeBytes(msg.getCrcCode());
         //endFlag
         byteBuf.writeByte(msg.getEndFlag());
-        log.info("downside by message...");
+        ctx.write(byteBuf);
     }
 }
