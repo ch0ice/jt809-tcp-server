@@ -56,8 +56,11 @@ public class PacketUtil {
      * 校验数据体
      * @return
      */
-    public static boolean checkPacket(byte[] basePacket){
-        boolean flag = false;
+    public static boolean checkPacket(byte[] readDatas){
+        //校验数据头 防止递归调用失败
+        if(!checkHeadFlag(readDatas) || !checkTailFlag(readDatas)){
+            return false;
+        }
         return true;
     }
 
@@ -107,6 +110,15 @@ public class PacketUtil {
      */
     public static boolean checkHeadFlag(byte[] realBytes){
         return JT809MessageConstants.MSG_HEAD == realBytes[0];
+    }
+
+    /**
+     * 校验数据尾标识
+     * @param readBytes
+     * @return
+     */
+    public static boolean checkTailFlag(byte[] readBytes){
+        return JT809MessageConstants.MSG_TAIL == readBytes[readBytes.length - 1];
     }
 
     /**

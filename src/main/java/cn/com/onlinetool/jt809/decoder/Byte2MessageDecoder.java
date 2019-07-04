@@ -90,14 +90,6 @@ public class Byte2MessageDecoder{
      * @param readDatas
      */
     private void parseAndPushData(ChannelHandlerContext ctx,String channelKey,byte[] readDatas){
-        //校验数据头 防止递归调用失败
-        if(!PacketUtil.checkHeadFlag(readDatas)){
-            //防止极端情况，请求头校验不通过的情况 丢掉本包数据 同时 丢掉上一包缓存的剩余数据
-            //防止上一包剩余数据不包含数据起始符 会导致拼接后的数据包一直校验不通过
-            cache.remove(channelKey);
-            log.warn("数据包标识符验证失败 : {}",ByteArrayUtil.bytes2HexStr(readDatas));
-            return;
-        }
 
         //整包长度
         int packetLen = PacketUtil.getPacketLen(readDatas);
@@ -105,8 +97,10 @@ public class Byte2MessageDecoder{
         //一个完整包
         byte[] fullPacket = ByteArrayUtil.subBytes(readDatas,0,packetLen);
         log.info("拆包后的单包数据 --> fullPacket : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
+
         //验证数据包有效性
         if(!PacketUtil.checkPacket(fullPacket)){
+            cache.remove(channelKey);
             log.info("数据校验失败 --> fullPacket : {}",ByteArrayUtil.bytes2HexStr(fullPacket));
             return;
         }
