@@ -136,12 +136,6 @@
             <version>${fastjson}</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.navinfo.wecloud.platform</groupId>
-            <artifactId>client-protocol</artifactId>
-            <version>${client.proptocol.version}</version>
-        </dependency>
-
     </dependencies>
 
 
