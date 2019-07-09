@@ -50,7 +50,57 @@ public class UpExgMsg {
         private int vec3;
         private int direction;
         private int altitude;
-        private int state;
-        private int alarm;
+        private State state;
+        private Alarm alarm;
+
+        /**
+         * 状态信息 参见JT/T808-2011 表17
+         */
+        @Data
+        @NoArgsConstructor
+        public static class State{
+            private int acc;
+            private int location;
+            private int lat;
+            private int lon;
+            private int operation;
+            private int latLonEncryption;
+            private int oilPath;
+            private int electricCircuit;
+            private int door;
+
+        }
+
+        /**
+         * 报警信息 参见JT/T808-2011 表18
+         */
+        @Data
+        @NoArgsConstructor
+        public static class Alarm{
+            private int emergencyAlarm;
+            private int overSpeed;
+            private int fatigueDriving;
+            private int earlyWarning;
+            private int gnssModuleError;
+            private int gnssAntennaDisconnect;
+            private int gnssAntennaShortCircuit;
+            private int terminalMainPowerUnderVoltage;
+            private int terminalMainPowerFailure;
+            private int terminalLcdError;
+            private int ttsModuleError;
+            private int cameraError;
+            private int cumulativeDrivingTimeout;
+            private int stopTimeout;
+            private int inOutArea;
+            private int inOutRoute;
+            private int roadDrivingTimeout;
+            private int laneDepartureError;
+            private int vssError;
+            private int oilError;
+            private int stolen;
+            private int illegalIgnition;
+            private int illegalMove;
+
+        }
     }
 }

@@ -310,10 +310,10 @@ public class ByteArrayUtil {
      * @param bytes
      * @return 二进制字符串
      */
-    public static String bytesToBitStr(byte[] bytes){
+    public static String bytes2bitStr(byte[] bytes){
         StringBuilder stringBuilder = new StringBuilder();
         for (byte b : bytes) {
-            stringBuilder.append(byteToBitStr(b));
+            stringBuilder.append(byte2bitStr(b));
         }
         return stringBuilder.toString();
     }
@@ -323,7 +323,7 @@ public class ByteArrayUtil {
      * @param b
      * @return 二进制字符串
      */
-    public static String byteToBitStr(byte b) {
+    public static String byte2bitStr(byte b) {
         return "" + (byte) ((b >> 7) & 0x1) + (byte) ((b >> 6) & 0x1)
                 + (byte) ((b >> 5) & 0x1) + (byte) ((b >> 4) & 0x1)
                 + (byte) ((b >> 3) & 0x1) + (byte) ((b >> 2) & 0x1)

@@ -40,7 +40,6 @@ public class UpExgMsgHandler implements CommonHandler{
         upExgMsg.setDataType(dataType);
         upExgMsg.setDataLen(dataLen);
         upExgMsg.setData(data);
-        log.info("车辆动态信息交换信息：" + JSONObject.toJSONString(upExgMsg));
         switch (dataType){
             case UpExg.UP_EXG_MSG_REGISTER:
                 upExgRegisterHandler(upExgMsg);
@@ -78,7 +77,7 @@ public class UpExgMsgHandler implements CommonHandler{
         register.setTerminalId(terminalId);
         register.setTerminalSimCode(terminalSimCode);
         msg.setUpExgMsgRegister(register);
-        log.info("车辆注册信息：" + JSONObject.toJSONString(register));
+        log.info("车辆动态信息交换-车辆注册信息：" + JSONObject.toJSONString(msg));
 
     }
 
@@ -106,9 +105,9 @@ public class UpExgMsgHandler implements CommonHandler{
         index += 2;
         int altitude =  ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getData(),index,2));
         index += 2;
-        int state =  ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getData(),index,2));
+        String state =  ByteArrayUtil.bytes2bitStr(ByteArrayUtil.subBytes(msg.getData(),index,4));
         index += 4;
-        int alarm =  ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getData(),index,2));
+        String alarm =  ByteArrayUtil.bytes2bitStr(ByteArrayUtil.subBytes(msg.getData(),index,4));
         index += 4;
 
         UpExgMsg.UpExgMsgRealLocation location = new UpExgMsg.UpExgMsgRealLocation();
@@ -121,10 +120,49 @@ public class UpExgMsgHandler implements CommonHandler{
         location.setVec3(vec3);
         location.setDirection(direction);
         location.setAltitude(altitude);
-        location.setState(state);
-        location.setAlarm(alarm);
+
+        UpExgMsg.UpExgMsgRealLocation.State upExgState = new UpExgMsg.UpExgMsgRealLocation.State();
+        int stateIdx = 0;
+        upExgState.setAcc(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setLocation(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setLon(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setLat(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setOperation(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setLatLonEncryption(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setOilPath(Integer.parseInt(state.substring(stateIdx += 4,++stateIdx)));
+        upExgState.setElectricCircuit(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setDoor(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        location.setState(upExgState);
+
+        UpExgMsg.UpExgMsgRealLocation.Alarm upExgAlarm = new UpExgMsg.UpExgMsgRealLocation.Alarm();
+        int alarmIdx = 0;
+        upExgAlarm.setEmergencyAlarm(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setOverSpeed(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setFatigueDriving(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setEarlyWarning(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setGnssModuleError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setGnssAntennaDisconnect(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setGnssAntennaShortCircuit(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setTerminalMainPowerUnderVoltage(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setTerminalMainPowerFailure(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setTerminalLcdError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setTtsModuleError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setCameraError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setCumulativeDrivingTimeout(Integer.parseInt(alarm.substring(alarmIdx += 6,++alarmIdx)));
+        upExgAlarm.setStopTimeout(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setInOutArea(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setInOutRoute(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setRoadDrivingTimeout(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setLaneDepartureError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setVssError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setOilError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setStolen(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setIllegalIgnition(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setIllegalMove(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        location.setAlarm(upExgAlarm);
+
         msg.setUpExgMsgRealLocation(location);
-        log.info("车辆实时定位信息：" + JSONObject.toJSONString(location));
+        log.info("车辆动态信息交换-车辆实时定位信息：" + JSONObject.toJSONString(msg));
     }
 
 }

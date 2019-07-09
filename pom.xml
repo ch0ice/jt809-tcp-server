@@ -58,6 +58,7 @@
         <junit>4.12</junit>
         <junit-jupiter>5.4.2</junit-jupiter>
         <maven-surefire>2.22.2</maven-surefire>
+        <client.proptocol.version>2.1</client.proptocol.version>
     </properties>
 
     <dependencies>
@@ -135,6 +136,11 @@
             <version>${fastjson}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.navinfo.wecloud.platform</groupId>
+            <artifactId>client-protocol</artifactId>
+            <version>${client.proptocol.version}</version>
+        </dependency>
 
     </dependencies>
 
