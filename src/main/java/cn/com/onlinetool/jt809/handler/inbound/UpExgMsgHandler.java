@@ -89,7 +89,7 @@ public class UpExgMsgHandler implements CommonHandler{
         int index = 0;
         int encrypy =  ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getData(),index,1));
         index += 1;
-        String dateTime =  ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(msg.getData(),index,7));
+        byte[] dateTime =  ByteArrayUtil.subBytes(msg.getData(),index,7);
         index += 7;
         double lon =  PacketUtil.parseLonOrLat(ByteArrayUtil.subBytes(msg.getData(),index,4));
         index += 4;
@@ -112,7 +112,7 @@ public class UpExgMsgHandler implements CommonHandler{
 
         UpExgMsg.UpExgMsgRealLocation location = new UpExgMsg.UpExgMsgRealLocation();
         location.setEncrypy(encrypy);
-        location.setDateTime(dateTime);
+        location.setDateTime(parseDateTime(dateTime));
         location.setLon(lon);
         location.setLat(lat);
         location.setVec1(vec1);
@@ -163,6 +163,21 @@ public class UpExgMsgHandler implements CommonHandler{
 
         msg.setUpExgMsgRealLocation(location);
         log.info("车辆动态信息交换-车辆实时定位信息：" + JSONObject.toJSONString(msg));
+    }
+
+    private String parseDateTime(byte[] dateTime){
+        int year = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(dateTime,2,2));
+        int month = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(dateTime,1,1));
+        int day = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(dateTime,0,1));
+        int hour = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(dateTime,4,1));
+        int minute = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(dateTime,5,1));
+        int second = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(dateTime,6,1));
+        return "" + year +
+                (month < 10 ? "0" + month : month) +
+                (day < 10 ? "0" + day : day) +
+                (hour < 10 ? "0" + hour : hour) +
+                (minute < 10 ? "0" + minute : minute) +
+                (second < 10 ? "0" + second : second);
     }
 
 }
