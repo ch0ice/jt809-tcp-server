@@ -24,7 +24,8 @@ public class UpExgMsgHandler implements CommonHandler{
     @Override
     public void handler(ChannelHandlerContext ctx, Message msg) {
         int index = 0;
-        String vehicleNo = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,21)).substring(0,7);
+        String vehicleNo = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,21));
+        vehicleNo = vehicleNo.replaceAll("\\u0000","");
         index += 21;
         int vehicleColor = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,1));
         index += 1;
