@@ -38,9 +38,10 @@ public class UpConnectHandler implements CommonHandler {
         int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,4));
         index += 4;
         String password = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,8));
-        byte[] bytePassword = ByteArrayUtil.subBytes(msg.getMsgBody(),index,8);
+        password = password.replaceAll("\\u0000","");
         index += 8;
         String downLinkIp = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,32));
+        downLinkIp = downLinkIp.replaceAll("\\u0000","");
         index += 32;
         int downLinkPort = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,2));
         index += 2;
@@ -54,55 +55,45 @@ public class UpConnectHandler implements CommonHandler {
 
         int testUser = 123456;
         String testPass = "test809";
-        byte[] byteTestPass = ByteArrayUtil.append(testPass.getBytes(),new byte[8 - testPass.getBytes().length]);
-        if(testUser == req.getUserId() && ByteArrayUtil.bytes2HexStr(byteTestPass).equals(ByteArrayUtil.bytes2HexStr(bytePassword))){
+
+        byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.SUCCESS};
+        byte[] verifyCode = new byte[4];
+        if(testUser == req.getUserId() && testPass.equals(password)){
             log.info("登陆成功");
-            byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.SUCCESS};
-            byte[] verifyCode = new byte[4];
             ByteArrayUtil.append(result,verifyCode);
             msg.setMsgBody(result);
             ctx.writeAndFlush(msg);
+            return;
         }
-        else if("".equals(req.getDownLinkIp())){
+        if("".equals(req.getDownLinkIp())){
             log.info("ip地址不正确");
-            byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.IP_ERROR};
-            byte[] verifyCode = new byte[4];
-            ByteArrayUtil.append(result,verifyCode);
-            msg.setMsgBody(result);
-            ctx.writeAndFlush(msg);
+            result = new byte[]{JT809ResCodeConstants.UpConnect.IP_ERROR};
+            verifyCode = new byte[4];
         }
         else if(123456 != msg.getMsgHead().getMsgGnssCenterId()){
             log.info("接入码不正确");
-            byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.GUSSCENTERID_ERROR};
-            byte[] verifyCode = new byte[4];
-            ByteArrayUtil.append(result,verifyCode);
-            msg.setMsgBody(result);
-            ctx.writeAndFlush(msg);
+            result = new byte[]{JT809ResCodeConstants.UpConnect.GUSSCENTERID_ERROR};
+            verifyCode = new byte[4];
         }
         else if(testUser != req.getUserId()){
             log.info("用户没有注册");
-            byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.USER_NOT_EXIST};
-            byte[] verifyCode = new byte[4];
-            ByteArrayUtil.append(result,verifyCode);
-            msg.setMsgBody(result);
-            ctx.writeAndFlush(msg);
+            result = new byte[]{JT809ResCodeConstants.UpConnect.USER_NOT_EXIST};
+            verifyCode = new byte[4];
         }
-        else if(ByteArrayUtil.bytes2HexStr(byteTestPass).equals(ByteArrayUtil.bytes2HexStr(bytePassword))){
+        else if(!testPass.equals(password)){
             log.info("密码错误");
-            byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.PASSWORD_ERROR};
-            byte[] verifyCode = new byte[4];
-            ByteArrayUtil.append(result,verifyCode);
-            msg.setMsgBody(result);
-            ctx.writeAndFlush(msg);
+            result = new byte[]{JT809ResCodeConstants.UpConnect.PASSWORD_ERROR};
+            verifyCode = new byte[4];
         }
         else {
             log.info("其他错误");
-            byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.OTHER_ERROR};
-            byte[] verifyCode = new byte[4];
-            ByteArrayUtil.append(result,verifyCode);
-            msg.setMsgBody(result);
-            ctx.writeAndFlush(msg);
+            result = new byte[]{JT809ResCodeConstants.UpConnect.OTHER_ERROR};
+            verifyCode = new byte[4];
         }
+        ByteArrayUtil.append(result,verifyCode);
+        msg.setMsgBody(result);
+        ctx.writeAndFlush(msg);
+        ctx.channel().close();
     }
 
 }
