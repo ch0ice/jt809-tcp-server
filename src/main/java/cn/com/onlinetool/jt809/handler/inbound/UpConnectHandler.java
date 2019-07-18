@@ -92,7 +92,7 @@ public class UpConnectHandler implements CommonHandler {
         }
         ByteArrayUtil.append(result,verifyCode);
         msg.setMsgBody(result);
-        ctx.writeAndFlush(msg);
+        ctx.write(msg);
         ctx.channel().close();
     }
 

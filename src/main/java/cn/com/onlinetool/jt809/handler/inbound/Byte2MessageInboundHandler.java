@@ -28,7 +28,7 @@ public class Byte2MessageInboundHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     Byte2MessageDecoder decoder;
     @Autowired
-    NettyConfig nettyConfig;
+    NettyConfig.NettyServerConfig nettyConfig;
     @Autowired
     BusinessConfig businessConfig;
     @Autowired

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class Message2ByteEncoder {
-    public void encode(ChannelHandlerContext ctx, Message msg) throws Exception {
+    public ByteBuf encode(ChannelHandlerContext ctx, Message msg) throws Exception {
         ByteBuf byteBuf = ctx.alloc().buffer();
         //headFlag
         byteBuf.writeByte(msg.getHeadFlag());
@@ -39,6 +39,6 @@ public class Message2ByteEncoder {
         byteBuf.writeBytes(msg.getCrcCode());
         //endFlag
         byteBuf.writeByte(msg.getEndFlag());
-        ctx.write(byteBuf);
+        return byteBuf;
     }
 }

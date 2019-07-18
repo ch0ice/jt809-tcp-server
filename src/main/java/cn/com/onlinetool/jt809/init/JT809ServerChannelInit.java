@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JT809ServerChannelInit extends ChannelInitializer<SocketChannel> {
     @Autowired
-    NettyConfig nettyConfig;
+    NettyConfig.NettyServerConfig nettyConfig;
     @Autowired
     Byte2MessageInboundHandler byte2MessageInboundHandler;
     @Autowired
