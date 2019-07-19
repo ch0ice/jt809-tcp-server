@@ -1,7 +1,7 @@
 package cn.com.onlinetool.jt809.init;
 
 import cn.com.onlinetool.jt809.config.NettyConfig;
-import cn.com.onlinetool.jt809.handler.inbound.Byte2MessageInboundHandler;
+import cn.com.onlinetool.jt809.handler.inbound.ServerByte2MessageInboundHandler;
 import cn.com.onlinetool.jt809.handler.inbound.MessageForwardInboundHandler;
 import cn.com.onlinetool.jt809.handler.outbound.Message2ByteOutboundHandler;
 import io.netty.channel.ChannelInitializer;
@@ -21,7 +21,7 @@ public class JT809ServerChannelInit extends ChannelInitializer<SocketChannel> {
     @Autowired
     NettyConfig.NettyServerConfig nettyConfig;
     @Autowired
-    Byte2MessageInboundHandler byte2MessageInboundHandler;
+    ServerByte2MessageInboundHandler serverByte2MessageInboundHandler;
     @Autowired
     MessageForwardInboundHandler messageForwardInboundHandler;
     @Autowired
@@ -32,7 +32,7 @@ public class JT809ServerChannelInit extends ChannelInitializer<SocketChannel> {
     public void initChannel(SocketChannel socketChannel) throws Exception {
         socketChannel.pipeline().addLast(new IdleStateHandler(nettyConfig.getReaderIdleTimeSeconds(),0,0));
         socketChannel.pipeline().addLast(message2ByteOutboundHandler);
-        socketChannel.pipeline().addLast(byte2MessageInboundHandler);
+        socketChannel.pipeline().addLast(serverByte2MessageInboundHandler);
         socketChannel.pipeline().addLast(messageForwardInboundHandler);
     }
 }

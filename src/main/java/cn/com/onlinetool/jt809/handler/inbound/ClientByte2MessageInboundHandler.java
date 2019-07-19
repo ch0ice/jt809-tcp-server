@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @ChannelHandler.Sharable
-public class Byte2MessageInboundHandler extends ChannelInboundHandlerAdapter {
+public class ClientByte2MessageInboundHandler extends ChannelInboundHandlerAdapter {
 
     @Autowired
     Byte2MessageDecoder decoder;
@@ -70,7 +70,7 @@ public class Byte2MessageInboundHandler extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //计数器减1
         tcpChannelMsgManage.decrementTcpClientConnectNum();
-        log.info("断开客户端连接,客户端信息 : {}",ctx.channel().remoteAddress().toString());
+        log.info("断开服务端连接,服务端信息 : {}",ctx.channel().remoteAddress().toString());
         super.channelInactive(ctx);
     }
 
@@ -90,8 +90,11 @@ public class Byte2MessageInboundHandler extends ChannelInboundHandlerAdapter {
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.READER_IDLE) {
-                log.warn("客户端连接超时,客户端信息 : {}",ctx.channel().remoteAddress().toString());
-                ctx.close();
+                log.warn("发送心跳包到服务端 : {}",ctx.channel().remoteAddress().toString());
+            }else if(state == IdleState.WRITER_IDLE){
+
+            }else if(state == IdleState.ALL_IDLE){
+                log.warn("发送心跳包到服务端 : {}",ctx.channel().remoteAddress().toString());
             }
         } else {
             super.userEventTriggered(ctx, evt);

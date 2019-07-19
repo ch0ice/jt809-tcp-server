@@ -46,9 +46,18 @@ public class NettyConfig {
         private Integer maxConnectNum;
 
         /**
-         * 客户端超时时间，如果空闲时间大于此值，关闭连接，单位秒
+         * 读事件空闲时间 秒
          */
         private Integer readerIdleTimeSeconds = 60;
+
+        /**
+         * 写事件空闲时间 秒
+         */
+        private Integer writerIdleTimeSeconds = 60;
+        /**
+         * 读写都空闲事件 秒
+         */
+        private Integer allIdleTimeSeconds = 60;
     }
 
     @Data
@@ -65,6 +74,19 @@ public class NettyConfig {
          * netty client port
          */
         private Integer tcpPort;
+        /**
+         * 读事件空闲时间 秒
+         */
+        private Integer readerIdleTimeSeconds = 60;
+
+        /**
+         * 写事件空闲时间 秒
+         */
+        private Integer writerIdleTimeSeconds = 60;
+        /**
+         * 读写都空闲事件 秒
+         */
+        private Integer allIdleTimeSeconds = 60;
     }
 
 
