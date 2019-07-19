@@ -1,4 +1,4 @@
-package cn.com.onlinetool.jt809.handler.inbound;
+package cn.com.onlinetool.jt809.handler;
 
 
 import cn.com.onlinetool.jt809.constants.JT809DataTypeConstants;
@@ -27,6 +27,7 @@ public class CommonHandlerFactory implements ApplicationContextAware {
     public void serverHandlerFactory() {
         handlers.put(JT809DataTypeConstants.UP_CONNECT_REQ,context.getBean(UpConnectHandler.class));
         handlers.put(JT809DataTypeConstants.UP_EXG_MSG,context.getBean(UpExgMsgHandler.class));
+        handlers.put(JT809DataTypeConstants.UP_LINKTEST_REQ,context.getBean(UpLinkTestHandler.class));
     }
 
     @Override

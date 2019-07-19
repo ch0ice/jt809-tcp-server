@@ -3,6 +3,7 @@ package cn.com.onlinetool.jt809.handler.inbound;
 import cn.com.onlinetool.jt809.config.BusinessConfig;
 import cn.com.onlinetool.jt809.config.NettyConfig;
 import cn.com.onlinetool.jt809.decoder.Byte2MessageDecoder;
+import cn.com.onlinetool.jt809.handler.CommonHandlerFactory;
 import cn.com.onlinetool.jt809.manage.TcpChannelMsgManage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;

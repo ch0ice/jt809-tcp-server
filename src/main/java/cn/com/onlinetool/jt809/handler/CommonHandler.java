@@ -1,4 +1,4 @@
-package cn.com.onlinetool.jt809.handler.inbound;
+package cn.com.onlinetool.jt809.handler;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import io.netty.channel.ChannelHandlerContext;

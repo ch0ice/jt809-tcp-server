@@ -1,7 +1,8 @@
-package cn.com.onlinetool.jt809.handler.inbound;
+package cn.com.onlinetool.jt809.handler;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpExgMsg;
+import cn.com.onlinetool.jt809.constants.JT809DataTypeConstants;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import cn.com.onlinetool.jt809.util.PacketUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -9,7 +10,6 @@ import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static cn.com.onlinetool.jt809.constants.JT809DataTypeConstants.*;
 
 /**
  * @author choice
@@ -42,10 +42,10 @@ public class UpExgMsgHandler implements CommonHandler{
         upExgMsg.setDataLen(dataLen);
         upExgMsg.setData(data);
         switch (dataType){
-            case UpExg.UP_EXG_MSG_REGISTER:
+            case JT809DataTypeConstants.UpExgMsg.UP_EXG_MSG_REGISTER:
                 upExgRegisterHandler(upExgMsg);
                 break;
-            case UpExg.UP_EXG_MSG_REAL_LOCATION:
+            case JT809DataTypeConstants.UpExgMsg.UP_EXG_MSG_REAL_LOCATION:
                 upExgMsgRealLocationHandler(upExgMsg);
                 break;
             default:

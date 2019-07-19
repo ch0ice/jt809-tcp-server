@@ -1,7 +1,8 @@
-package cn.com.onlinetool.jt809.handler.inbound;
+package cn.com.onlinetool.jt809.handler;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpConnectReq;
+import cn.com.onlinetool.jt809.constants.JT809DataTypeConstants;
 import cn.com.onlinetool.jt809.constants.JT809ResCodeConstants;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -33,17 +34,17 @@ public class UpConnectHandler implements CommonHandler {
      * 登陆逻辑处理
      * @param msg
      */
-    private void login(ChannelHandlerContext ctx,Message msg){
+    private void login(ChannelHandlerContext ctx,Message msg) {
         int index = 0;
-        int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,4));
+        int userId = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(), index, 4));
         index += 4;
-        String password = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,8));
-        password = password.replaceAll("\\u0000","");
+        String password = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(), index, 8));
+        password = password.replaceAll("\\u0000", "");
         index += 8;
-        String downLinkIp = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(),index,32));
-        downLinkIp = downLinkIp.replaceAll("\\u0000","");
+        String downLinkIp = ByteArrayUtil.bytes2gbkString(ByteArrayUtil.subBytes(msg.getMsgBody(), index, 32));
+        downLinkIp = downLinkIp.replaceAll("\\u0000", "");
         index += 32;
-        int downLinkPort = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(),index,2));
+        int downLinkPort = ByteArrayUtil.bytes2int(ByteArrayUtil.subBytes(msg.getMsgBody(), index, 2));
         index += 2;
 
         UpConnectReq req = new UpConnectReq();
@@ -58,42 +59,35 @@ public class UpConnectHandler implements CommonHandler {
 
         byte[] result = new byte[]{JT809ResCodeConstants.UpConnect.SUCCESS};
         byte[] verifyCode = new byte[4];
-        if(testUser == req.getUserId() && testPass.equals(password)){
+        msg.getMsgHead().setMsgId((short) JT809DataTypeConstants.UP_CONNECT_RSP);
+        if (testUser == req.getUserId() && testPass.equals(password)) {
             log.info("登陆成功");
-            ByteArrayUtil.append(result,verifyCode);
-            msg.setMsgBody(result);
-            ctx.writeAndFlush(msg);
+            byte[] body = ByteArrayUtil.append(result, verifyCode);
+            msg.getMsgHead().setMsgLength(msg.getMsgHead().getMsgLength() - msg.getMsgBody().length + body.length);
+            msg.setMsgBody(body);
+            ctx.write(msg);
             return;
         }
-        if("".equals(req.getDownLinkIp())){
+        if ("".equals(req.getDownLinkIp())) {
             log.info("ip地址不正确");
             result = new byte[]{JT809ResCodeConstants.UpConnect.IP_ERROR};
-            verifyCode = new byte[4];
-        }
-        else if(123456 != msg.getMsgHead().getMsgGnssCenterId()){
+        } else if (123456 != msg.getMsgHead().getMsgGnssCenterId()) {
             log.info("接入码不正确");
             result = new byte[]{JT809ResCodeConstants.UpConnect.GUSSCENTERID_ERROR};
-            verifyCode = new byte[4];
-        }
-        else if(testUser != req.getUserId()){
+        } else if (testUser != req.getUserId()) {
             log.info("用户没有注册");
             result = new byte[]{JT809ResCodeConstants.UpConnect.USER_NOT_EXIST};
-            verifyCode = new byte[4];
-        }
-        else if(!testPass.equals(password)){
+        } else if (!testPass.equals(password)) {
             log.info("密码错误");
             result = new byte[]{JT809ResCodeConstants.UpConnect.PASSWORD_ERROR};
-            verifyCode = new byte[4];
-        }
-        else {
+        } else {
             log.info("其他错误");
             result = new byte[]{JT809ResCodeConstants.UpConnect.OTHER_ERROR};
-            verifyCode = new byte[4];
         }
-        ByteArrayUtil.append(result,verifyCode);
-        msg.setMsgBody(result);
+        byte[] body = ByteArrayUtil.append(result, verifyCode);
+        msg.getMsgHead().setMsgLength(msg.getMsgHead().getMsgLength() - msg.getMsgBody().length + body.length);
+        msg.setMsgBody(body);
         ctx.write(msg);
         ctx.channel().close();
     }
-
 }

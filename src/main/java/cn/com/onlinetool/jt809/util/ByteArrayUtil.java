@@ -50,11 +50,9 @@ public class ByteArrayUtil {
      * @return byte[]
      */
     public static byte[] short2Bytes(short number) {
-        int temp = number;
-        byte[] b = new byte[2]; // 将最低位保存在最低位
-        b[0] = (byte)(temp & 0xff);
-        temp = temp >> 8; // 向右移8位
-        b[1] = (byte)(temp & 0xff);
+        byte[] b = new byte[2];
+        b[0] = (byte) (number >> 8);
+        b[1] = (byte) (number & 0xFF);
         return b;
     }
 
@@ -64,9 +62,7 @@ public class ByteArrayUtil {
      * @return short
      */
     public static short bytes2Short(byte[] bytes){
-        byte high = bytes[0];
-        byte low = bytes[1];
-        short z = (short)(((high & 0x00FF) << 8) | (0x00FF & low));
+        short z = (short)((bytes[0] << 8) | (bytes[1] & 0xFF));
         return z;
     }
 
@@ -206,6 +202,15 @@ public class ByteArrayUtil {
             }
         }
         return sb.toString().toLowerCase();
+    }
+
+    /**
+     * short to 16进制字符串
+     * @param num
+     * @return
+     */
+    public static String short2HexStr(short num){
+        return Integer.toHexString(num);
     }
 
     /**

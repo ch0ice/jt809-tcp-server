@@ -2,18 +2,14 @@ package cn.com.onlinetool.jt809.handler.inbound;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.config.BusinessConfig;
+import cn.com.onlinetool.jt809.handler.CommonHandlerFactory;
+import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author choice
@@ -30,19 +26,15 @@ public class MessageForwardInboundHandler extends ChannelInboundHandlerAdapter {
     @Autowired
     CommonHandlerFactory handlerFactory;
 
-    private static ExecutorService businessExecutor;
-    @PostConstruct
-    public void businessExecutorInit() {
-        businessExecutor = new ThreadPoolExecutor(businessConfig.getCorePoolSize(), businessConfig.getMaximumPoolSize(), businessConfig.getKeepAliveTime(), TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(100000));
-    }
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Message message = (Message)msg;
-        businessExecutor.submit(() -> {
-            handlerFactory.getHandler((int)message.getMsgHead().getMsgId()).handler(ctx,message);
-        });
-    }
+        if(null == handlerFactory.getHandler((int)message.getMsgHead().getMsgId())){
+            log.warn("暂不支持此类型消息：" + ByteArrayUtil.short2HexStr(message.getMsgHead().getMsgId()));
+            return;
+        }
+        handlerFactory.getHandler((int)message.getMsgHead().getMsgId()).handler(ctx,message);
+}
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {

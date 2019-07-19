@@ -93,14 +93,43 @@ public class PacketUtil {
         message.setMsgHead(messageHead);
         idx += 4;
         int dataLen = getMsgBodyLen(fullPacket);
-        message.setMsgBody(ByteArrayUtil.subBytes(fullPacket,idx,dataLen));
-        idx += dataLen;
+        if(dataLen > 0){
+            message.setMsgBody(ByteArrayUtil.subBytes(fullPacket,idx,dataLen));
+            idx += dataLen;
+        }
         message.setCrcCode(ByteArrayUtil.subBytes(fullPacket,idx,2));
         idx += 2;
         message.setEndFlag(fullPacket[fullPacket.length - 1]);
         idx += 1;
 
         return message;
+    }
+
+    public static byte[] message2Bytes(Message msg){
+        //headFlag
+        byte[] res = new byte[]{(byte) msg.getHeadFlag()};
+        //dataHead
+        byte[] msgLength = ByteArrayUtil.int2bytes(msg.getMsgHead().getMsgLength());
+        res = ByteArrayUtil.append(res,msgLength);
+        byte[] msgSn = ByteArrayUtil.int2bytes(msg.getMsgHead().getMsgSn());
+        res = ByteArrayUtil.append(res,msgSn);
+        byte[] msgId = ByteArrayUtil.short2Bytes(msg.getMsgHead().getMsgId());
+        res = ByteArrayUtil.append(res,msgId);
+        byte[] msgGnssCenterId = ByteArrayUtil.int2bytes(msg.getMsgHead().getMsgGnssCenterId());
+        res = ByteArrayUtil.append(res,msgGnssCenterId);
+        byte[] encrypyKey = ByteArrayUtil.int2bytes(msg.getMsgHead().getEncryptKey());
+        res = ByteArrayUtil.append(res,encrypyKey);
+        res = ByteArrayUtil.append(res,msg.getMsgHead().getVersionFlag());
+        res = ByteArrayUtil.append(res,new byte[]{(byte)msg.getMsgHead().getEncryptFlag()});
+        //dataBody
+        if(null != msg.getMsgBody()){
+            res = ByteArrayUtil.append(res,msg.getMsgBody());
+        }
+        //crc
+        res = ByteArrayUtil.append(res,msg.getCrcCode());
+        //endFlag
+        res = ByteArrayUtil.append(res,new byte[]{(byte)msg.getEndFlag()});
+        return res;
     }
 
     /**

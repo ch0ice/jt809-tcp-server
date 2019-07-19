@@ -57,7 +57,8 @@ public class JT809Server {
             serverBootstrap.handler(new LoggingHandler(LogLevel.INFO));
             //接收到的信息处理器
             serverBootstrap.childHandler(JT809ServerChannelInit);
-            serverBootstrap.option(ChannelOption.SO_BACKLOG,1024);
+            serverBootstrap.option(ChannelOption.SO_BACKLOG,128);
+            serverBootstrap.option(ChannelOption.TCP_NODELAY, true);
             serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE,true);
             //ChannelFuture描述异步回调的处理操作
             ChannelFuture future = serverBootstrap.bind(serverConfig.getTcpPort()).sync();
@@ -118,7 +119,7 @@ public class JT809Server {
     }
 
     private void sendTestMsgToServer(){
-        byte[] testLogin = ByteArrayUtil.hexStr2Bytes("5B000000480000005210010001E24001000100000000000001E2407465737438303900312E37312E3132392E32303100000000000000000000000000000000000000004E8ED9BA5D5B0000001A0000005310050001E2400100010000000000661D5D");
+        byte[] testLogin = ByteArrayUtil.hexStr2Bytes("5B000000480000005210010001E24001000100000000000001E2407465737438303900312E37312E3132392E32303100000000000000000000000000000000000000004E8ED9BA5D");
         Message message = PacketUtil.bytes2Message(testLogin);
         clientChannel.write(message);
     }

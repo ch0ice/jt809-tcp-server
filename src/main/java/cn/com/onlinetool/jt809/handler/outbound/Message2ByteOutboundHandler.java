@@ -2,7 +2,6 @@ package cn.com.onlinetool.jt809.handler.outbound;
 
 import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.encoder.Message2ByteEncoder;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,9 +63,8 @@ public class Message2ByteOutboundHandler extends ChannelOutboundHandlerAdapter {
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         System.out.println("write..........");
-        ByteBuf byteBuf = message2ByteEncoder.encode(ctx,(Message) msg);
-        ctx.writeAndFlush(byteBuf);
-        byteBuf.release();
+        message2ByteEncoder.encode(ctx,(Message) msg);
+        ctx.flush();
     }
 
     @Override
