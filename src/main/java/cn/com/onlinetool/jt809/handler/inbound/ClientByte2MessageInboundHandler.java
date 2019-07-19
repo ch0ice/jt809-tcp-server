@@ -1,10 +1,13 @@
 package cn.com.onlinetool.jt809.handler.inbound;
 
+import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.config.BusinessConfig;
 import cn.com.onlinetool.jt809.config.NettyConfig;
 import cn.com.onlinetool.jt809.decoder.Byte2MessageDecoder;
 import cn.com.onlinetool.jt809.handler.CommonHandlerFactory;
 import cn.com.onlinetool.jt809.manage.TcpChannelMsgManage;
+import cn.com.onlinetool.jt809.util.ByteArrayUtil;
+import cn.com.onlinetool.jt809.util.PacketUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,19 +53,6 @@ public class ClientByte2MessageInboundHandler extends ChannelInboundHandlerAdapt
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        if(null != nettyConfig.getMaxConnectNum() && nettyConfig.getMaxConnectNum() > 0){
-            //判断当前连接数是否大于 配置的最大连接数 如果大于最大连接数直接关闭连接
-            if(tcpChannelMsgManage.getTcpClientConnectNum() > nettyConfig.getMaxConnectNum()){
-                log.warn("当前节点连接数已经超过最大连接数 : {}", tcpChannelMsgManage.getTcpClientConnectNum());
-                //关闭客户端连接
-                ctx.channel().close();
-                return;
-            }
-        }
-
-        //计数器加1
-        tcpChannelMsgManage.incrementTcpClientConnectNum();
-        log.info("连接到新客户端，当前节点连接数 : {}", tcpChannelMsgManage.getTcpClientConnectNum());
         super.channelActive(ctx);
     }
 
@@ -90,11 +80,13 @@ public class ClientByte2MessageInboundHandler extends ChannelInboundHandlerAdapt
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
             if (state == IdleState.READER_IDLE) {
-                log.warn("发送心跳包到服务端 : {}",ctx.channel().remoteAddress().toString());
-            }else if(state == IdleState.WRITER_IDLE){
 
+            }else if(state == IdleState.WRITER_IDLE){
+                log.warn("发送心跳包到服务端 : {}",ctx.channel().remoteAddress().toString());
+                this.sendTestMsgToServer(ctx);
             }else if(state == IdleState.ALL_IDLE){
                 log.warn("发送心跳包到服务端 : {}",ctx.channel().remoteAddress().toString());
+                this.sendTestMsgToServer(ctx);
             }
         } else {
             super.userEventTriggered(ctx, evt);
@@ -110,5 +102,16 @@ public class ClientByte2MessageInboundHandler extends ChannelInboundHandlerAdapt
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.error("发生错误.......",cause);
         ctx.close();
+    }
+
+    /**
+     * 测试心跳包发送
+     * @param ctx
+     * @return
+     */
+    private void sendTestMsgToServer(ChannelHandlerContext ctx){
+        byte[] testLogin = ByteArrayUtil.hexStr2Bytes("5B0000001A0000257A10050001E24001000100000000001C525D");
+        Message message = PacketUtil.bytes2Message(testLogin);
+        ctx.write(message);
     }
 }

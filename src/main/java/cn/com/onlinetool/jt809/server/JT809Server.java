@@ -1,11 +1,9 @@
 package cn.com.onlinetool.jt809.server;
 
-import cn.com.onlinetool.jt809.bean.Message;
+import cn.com.onlinetool.jt809.config.BusinessConfig;
 import cn.com.onlinetool.jt809.config.NettyConfig;
 import cn.com.onlinetool.jt809.init.JT809ClientChannelInit;
 import cn.com.onlinetool.jt809.init.JT809ServerChannelInit;
-import cn.com.onlinetool.jt809.util.ByteArrayUtil;
-import cn.com.onlinetool.jt809.util.PacketUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -36,6 +34,8 @@ public class JT809Server {
     @Autowired
     private NettyConfig.NettyServerConfig serverConfig;
     @Autowired
+    private BusinessConfig businessConfig;
+    @Autowired
     private JT809ServerChannelInit JT809ServerChannelInit;
 
     /**
@@ -64,8 +64,10 @@ public class JT809Server {
             ChannelFuture future = serverBootstrap.bind(serverConfig.getTcpPort()).sync();
 
             log.info("nettyServer run success,TCP-PORT:{}",serverConfig.getTcpPort());
-            //启动从链路
-            this.runClient(future.channel().eventLoop());
+            if(businessConfig.getIsOpenClient()){
+                //启动从链路
+                this.runClient(future.channel().eventLoop());
+            }
             //等待socket被关闭
             future.channel().closeFuture().sync();
         } catch (Exception e){
@@ -102,14 +104,13 @@ public class JT809Server {
             client.option(ChannelOption.TCP_NODELAY, true);
             client.option(ChannelOption.TCP_NODELAY, true);
             client.handler(jt809ClientChannelInit);
-            ChannelFuture channelFuture = client.connect(ip, port);
+            ChannelFuture channelFuture = client.connect(ip, port).sync();
             channelFuture.addListener(new GenericFutureListener() {
                 @Override
                 public void operationComplete(Future future) throws Exception {
                     if (future.isSuccess()) {
                         log.info("nettyClient run success,TCP-IP:{},TCP-PORT:{}",ip,port);
                         clientChannel = channelFuture.channel();
-                        sendTestMsgToServer();
                     }
                 }
             });
@@ -119,9 +120,5 @@ public class JT809Server {
         }
     }
 
-    private void sendTestMsgToServer(){
-        byte[] testLogin = ByteArrayUtil.hexStr2Bytes("5B000000480000005210010001E24001000100000000000001E2407465737438303900312E37312E3132392E32303100000000000000000000000000000000000000004E8ED9BA5D");
-        Message message = PacketUtil.bytes2Message(testLogin);
-        clientChannel.write(message);
-    }
+
 }

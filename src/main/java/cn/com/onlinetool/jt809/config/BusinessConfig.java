@@ -42,4 +42,9 @@ public class BusinessConfig {
      * kafka输出topic
      */
     private String outputKafkaTopic;
+
+    /**
+     * 是否启动从链路 默认不启动
+     */
+    private Boolean isOpenClient = false;
 }

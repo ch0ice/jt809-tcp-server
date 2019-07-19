@@ -1,6 +1,7 @@
 package cn.com.onlinetool.jt809.handler;
 
 import cn.com.onlinetool.jt809.bean.Message;
+import cn.com.onlinetool.jt809.constants.JT809DataTypeConstants;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class UpLinkTestHandler implements CommonHandler{
     @Override
     public void handler(ChannelHandlerContext ctx, Message msg) {
         log.info("接收到心跳包");
+        msg.getMsgHead().setMsgId((short) JT809DataTypeConstants.UP_LINKTEST_RSP);
         ctx.write(msg);
     }
 }
