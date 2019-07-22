@@ -102,7 +102,6 @@ public class JT809Server {
             client.group(group);
             client.channel(NioSocketChannel.class);
             client.option(ChannelOption.TCP_NODELAY, true);
-            client.option(ChannelOption.TCP_NODELAY, true);
             client.handler(jt809ClientChannelInit);
             ChannelFuture channelFuture = client.connect(ip, port).sync();
             channelFuture.addListener(new GenericFutureListener() {
