@@ -125,7 +125,7 @@ public class Byte2MessageDecoder {
         }
 
         //下一包数据的总长度
-        packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(data, 0, data.length));
+        packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(data,data.length - remainingLen, remainingLen));
         //剩余数据长度小于整包数据长度
         if (remainingLen < packetLen) {
             log.warn("剩余数据长度小于整包数据长度，缓存数据：{}", ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(data, 0, remainingLen)));
