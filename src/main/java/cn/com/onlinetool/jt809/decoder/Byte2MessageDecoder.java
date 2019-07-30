@@ -119,7 +119,7 @@ public class Byte2MessageDecoder {
 
         //剩余数据长度小于一包数据的最小长度，缓存数据
         if (remainingLen < JT809MessageConstants.MSG_MIN_LEN) {
-            log.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}", ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(data, 0, remainingLen)));
+            log.warn("剩余数据长度小于整包数据最小长度，缓存数据：{}", ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(data, data.length - remainingLen, remainingLen)));
             cache.put(channelKey, ByteArrayUtil.subBytes(data, data.length - remainingLen, remainingLen));
             return;
         }
@@ -128,7 +128,7 @@ public class Byte2MessageDecoder {
         packetLen = PacketUtil.getPacketLen(ByteArrayUtil.subBytes(data,data.length - remainingLen, remainingLen));
         //剩余数据长度小于整包数据长度
         if (remainingLen < packetLen) {
-            log.warn("剩余数据长度小于整包数据长度，缓存数据：{}", ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(data, 0, remainingLen)));
+            log.warn("剩余数据长度小于整包数据长度，缓存数据：{}", ByteArrayUtil.bytes2HexStr(ByteArrayUtil.subBytes(data, data.length - remainingLen, remainingLen)));
             cache.put(channelKey, ByteArrayUtil.subBytes(data, data.length - remainingLen, remainingLen));
             return;
         }
