@@ -13,4 +13,10 @@ public class CRC16CCITT {
         crc &= 0xffff;
         return crc;
     }
+    public static byte[]  crcBytes(byte[] bytes){
+        byte[] int2bytes = ByteArrayUtil.int2bytes(crc16(bytes));
+        byte[] int2bytes2 =  {int2bytes[2],int2bytes[3]};
+        return int2bytes2;
+    }
+
 }

@@ -130,7 +130,10 @@ public class UpExgMsgHandler implements CommonHandler{
         upExgState.setLat(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
         upExgState.setOperation(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
         upExgState.setLatLonEncryption(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
-        upExgState.setOilPath(Integer.parseInt(state.substring(stateIdx += 4,++stateIdx)));
+        upExgState.setForwardCollisionWarning(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setLaneDepartureWarning(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setLoadRating(Integer.parseInt(state.substring(stateIdx,++stateIdx))*2+Integer.parseInt(state.substring(stateIdx,++stateIdx)));
+        upExgState.setOilPath(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
         upExgState.setElectricCircuit(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
         upExgState.setDoor(Integer.parseInt(state.substring(stateIdx,++stateIdx)));
         location.setState(upExgState);
@@ -149,7 +152,11 @@ public class UpExgMsgHandler implements CommonHandler{
         upExgAlarm.setTerminalLcdError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         upExgAlarm.setTtsModuleError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         upExgAlarm.setCameraError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
-        upExgAlarm.setCumulativeDrivingTimeout(Integer.parseInt(alarm.substring(alarmIdx += 6,++alarmIdx)));
+        upExgAlarm.setIcModuleError(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setOverspeedWarning(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setDriverFatigueMonitor(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setBanOnDrivingWarning(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setCumulativeDrivingTimeout(Integer.parseInt(alarm.substring(alarmIdx += 2,++alarmIdx)));
         upExgAlarm.setStopTimeout(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         upExgAlarm.setInOutArea(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         upExgAlarm.setInOutRoute(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
@@ -160,6 +167,8 @@ public class UpExgMsgHandler implements CommonHandler{
         upExgAlarm.setStolen(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         upExgAlarm.setIllegalIgnition(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         upExgAlarm.setIllegalMove(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setCollisionRollover(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
+        upExgAlarm.setRolloverWarning(Integer.parseInt(alarm.substring(alarmIdx,++alarmIdx)));
         location.setAlarm(upExgAlarm);
 
         msg.setUpExgMsgRealLocation(location);
