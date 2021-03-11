@@ -106,11 +106,8 @@ public class PacketUtil {
     }
 
     public static byte[] message2Bytes(Message msg){
-        //headFlag
-        byte[] res = new byte[]{(byte) msg.getHeadFlag()};
         //dataHead
-        byte[] msgLength = ByteArrayUtil.int2bytes(msg.getMsgHead().getMsgLength());
-        res = ByteArrayUtil.append(res,msgLength);
+        byte[] res = ByteArrayUtil.int2bytes(msg.getMsgHead().getMsgLength());
         byte[] msgSn = ByteArrayUtil.int2bytes(msg.getMsgHead().getMsgSn());
         res = ByteArrayUtil.append(res,msgSn);
         byte[] msgId = ByteArrayUtil.short2Bytes(msg.getMsgHead().getMsgId());
@@ -126,7 +123,9 @@ public class PacketUtil {
             res = ByteArrayUtil.append(res,msg.getMsgBody());
         }
         //crc
-        res = ByteArrayUtil.append(res,msg.getCrcCode());
+        res = ByteArrayUtil.append(res,CRC16CCITT.crcBytes(res));
+        // headFlag
+        res = ByteArrayUtil.append(new byte[]{(byte) msg.getHeadFlag()},res);
         //endFlag
         res = ByteArrayUtil.append(res,new byte[]{(byte)msg.getEndFlag()});
         return res;
