@@ -49,7 +49,7 @@ public class JT809TcpClient {
                 public void operationComplete(Future future) throws Exception {
                     if(future.isSuccess()){
                         System.out.println("服务器连接已经完成，可以确保进行消息准确传输");
-                        channelFuture.channel().write(ByteArrayUtil.hexStr2Bytes("5B000000480000005210010001E24001000100000000000001E2407465737438303900312E37312E3132392E32303100000000000000000000000000000000000000004E8ED9BA5D"));
+//                        channelFuture.channel().write(ByteArrayUtil.hexStr2Bytes("5B000000480000005210010001E24001000100000000000001E2407465737438303900312E37312E3132392E32303100000000000000000000000000000000000000004E8ED9BA5D"));
                     }
                 }
             });

@@ -163,7 +163,7 @@ public class TcpChannelMsgManage {
      */
     public void addChannel(String tid,Channel channel){
         if (!CHANNEL_MAP.containsKey(tid) && channel.isActive()) {
-            redisTemplate.opsForValue().set(TCP_CHANNEL_PREFIX_REDIS_KEY + tid,this.getIpAndPort());
+//            redisTemplate.opsForValue().set(TCP_CHANNEL_PREFIX_REDIS_KEY + tid,this.getIpAndPort());
             CHANNEL_MAP.put(tid,channel);
         }
     }

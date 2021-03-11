@@ -4,11 +4,14 @@ import cn.com.onlinetool.jt809.bean.Message;
 import cn.com.onlinetool.jt809.bean.UpConnectReq;
 import cn.com.onlinetool.jt809.constants.JT809DataTypeConstants;
 import cn.com.onlinetool.jt809.constants.JT809ResCodeConstants;
+import cn.com.onlinetool.jt809.manage.TcpChannelMsgManage;
 import cn.com.onlinetool.jt809.util.ByteArrayUtil;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @author choice
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class UpConnectHandler implements CommonHandler {
+    @Resource
+    TcpChannelMsgManage channelMsgManage;
 //    @Autowired
 //    KafkaTemplate<String,Object> kafkaTemplate;
 //    @Autowired
@@ -66,6 +71,8 @@ public class UpConnectHandler implements CommonHandler {
             msg.getMsgHead().setMsgLength(msg.getMsgHead().getMsgLength() - msg.getMsgBody().length + body.length);
             msg.setMsgBody(body);
             ctx.write(msg);
+            channelMsgManage.addChannel(Integer.toString(testUser),ctx.channel());
+
             return;
         }
         if ("".equals(req.getDownLinkIp())) {
