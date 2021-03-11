@@ -79,6 +79,7 @@ public class Byte2MessageDecoder {
         //解析数据
         this.parseAndPushData(ctx, channelKey, 0, readDatas);
 
+        msg.release();
     }
 
 
