@@ -55,7 +55,7 @@
         <msgpack.version>0.6.12</msgpack.version>
         <spring-boot-starter>2.1.6.RELEASE</spring-boot-starter>
         <spring-kafka>2.2.7.RELEASE</spring-kafka>
-        <junit>4.12</junit>
+        <junit>4.13.1</junit>
         <junit-jupiter>5.4.2</junit-jupiter>
         <maven-surefire>2.22.2</maven-surefire>
         <client.proptocol.version>2.1</client.proptocol.version>
