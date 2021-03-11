@@ -1,7 +1,6 @@
 package cn.com.onlinetool.jt809.client;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
@@ -17,5 +16,6 @@ public class Message2ByteEncoder extends MessageToByteEncoder {
     protected void encode(ChannelHandlerContext ctx, Object msg, ByteBuf byteBuf) throws Exception {
         byteBuf.writeBytes((byte[]) msg);
         ctx.writeAndFlush(byteBuf);
+        byteBuf.release();
     }
 }
