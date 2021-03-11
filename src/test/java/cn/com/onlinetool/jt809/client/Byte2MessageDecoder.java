@@ -24,6 +24,5 @@ public class Byte2MessageDecoder extends ByteToMessageDecoder {
         byte[] readDatas = new byte[msg.readableBytes()];
         msg.readBytes(readDatas);
         log.info("接收到服务端发送的下行消息：{}", ByteArrayUtil.bytes2HexStr(readDatas));
-        msg.release();
     }
 }
