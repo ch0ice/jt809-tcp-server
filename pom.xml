@@ -48,7 +48,7 @@
 
         <mockito.version>1.10.19</mockito.version>
         <netty.version>4.1.42.Final</netty.version>
-        <fastjson>1.2.41</fastjson>
+        <fastjson>1.2.83</fastjson>
         <client.proptocol.version>2.1</client.proptocol.version>
         <marshalling.version>2.0.6.Final</marshalling.version>
         <lombok.version>1.18.4</lombok.version>
